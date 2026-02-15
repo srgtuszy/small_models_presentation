@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Small Models Running in Your App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/reveal.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/theme/black.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/plugin/highlight/monokai.css">
+    
+    <style>
+        .reveal-viewport {
+            background: #191919;
+        }
+        
+        .reveal .slides section {
+            height: 100%;
+            top: 0 !important;
+        }
+        
+        .reveal .slides section > * {
+            margin: 0.2em 0;
+        }
+        
+        .reveal h1, .reveal h2, .reveal h3, .reveal h4 {
+            text-transform: none;
+            letter-spacing: -0.02em;
+            font-weight: 700;
+            margin: 0.15em 0;
+        }
+        
+        .reveal h1 { font-size: 1.6em; }
+        .reveal h2 { font-size: 1.2em; margin-bottom: 0.3em; }
+        .reveal h3 { font-size: 0.95em; }
+        .reveal h4 { font-size: 0.8em; margin-bottom: 0.1em; }
+        
+        .reveal section {
+            text-align: left;
+        }
+        
+        .reveal section.center {
+            text-align: center;
+        }
+        
+        .reveal p {
+            margin: 0.2em 0;
+            font-size: 0.75em;
+        }
+        
+        .reveal .lead {
+            font-size: 0.9em;
+            margin: 0.3em 0;
+        }
+        
+        .reveal .sub {
+            color: #888;
+            font-size: 0.65em;
+        }
+        
+        .reveal table {
+            margin: 0.2em 0;
+            font-size: 0.5em;
+        }
+        
+        .reveal table th {
+            background: rgba(66, 175, 250, 0.25);
+            text-transform: none;
+        }
+        
+        .reveal table td, .reveal table th {
+            padding: 0.25em 0.5em;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .reveal .hl { color: #42affa; font-weight: bold; }
+        .reveal .accent { color: #f0a868; }
+        .reveal .green { color: #8be9c0; }
+        .reveal .dim { color: #666; font-size: 0.85em; }
+        .reveal .warn { color: #ff6b6b; }
+        
+        .reveal code:not([class]) {
+            background: rgba(0,0,0,0.4);
+            padding: 0.1em 0.3em;
+            border-radius: 3px;
+            font-size: 0.75em;
+        }
+        
+        .reveal pre {
+            width: 100%;
+            margin: 0.2em 0;
+        }
+        
+        .reveal pre code {
+            padding: 0.5em;
+            font-size: 0.4em;
+            line-height: 1.3;
+        }
+        
+        .reveal .cols {
+            display: flex;
+            gap: 0.8em;
+            align-items: flex-start;
+        }
+        
+        .reveal .cols > * {
+            flex: 1;
+        }
+        
+        .reveal .card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 6px;
+            padding: 0.4em;
+            margin: 0.2em 0;
+            font-size: 0.7em;
+        }
+        
+        .reveal .big {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: #42affa;
+            line-height: 1;
+        }
+        
+        .reveal .flow {
+            display: flex;
+            align-items: center;
+            gap: 0.3em;
+            font-size: 0.5em;
+            flex-wrap: wrap;
+        }
+        
+        .reveal .flow .box {
+            background: rgba(66, 175, 250, 0.2);
+            border: 1px solid rgba(66, 175, 250, 0.4);
+            border-radius: 4px;
+            padding: 0.25em 0.4em;
+            white-space: nowrap;
+        }
+        
+        .reveal .flow .arrow {
+            color: #42affa;
+        }
+        
+        .reveal .demo-box {
+            background: linear-gradient(135deg, rgba(66, 175, 250, 0.15), rgba(240, 168, 104, 0.15));
+            border-radius: 8px;
+            padding: 0.6em;
+            text-align: center;
+            margin: 0.3em 0;
+        }
+        
+        .reveal ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            font-size: 0.65em;
+        }
+        
+        .reveal ul li {
+            position: relative;
+            padding-left: 1em;
+            margin: 0.15em 0;
+        }
+        
+        .reveal ul li::before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: #42affa;
+        }
+        
+        .reveal ol {
+            margin: 0;
+            padding-left: 1.2em;
+            font-size: 0.65em;
+        }
+        
+        .reveal ol li {
+            margin: 0.15em 0;
+        }
+        
+        .reveal .speaker-hint {
+            position: absolute;
+            bottom: 0.5em;
+            right: 0.5em;
+            font-size: 0.4em;
+            color: #444;
+            font-style: italic;
+        }
+        
+        .reveal .example {
+            background: rgba(139, 233, 192, 0.1);
+            border-left: 3px solid #8be9c0;
+            padding: 0.3em 0.5em;
+            margin: 0.3em 0;
+            font-size: 0.6em;
+        }
+        
+        .reveal .key-point {
+            border-left: 3px solid #42affa;
+            padding-left: 0.5em;
+            margin: 0.3em 0;
+            font-size: 0.7em;
+        }
+        
+        .reveal .badge {
+            display: inline-block;
+            background: rgba(66, 175, 250, 0.3);
+            padding: 0.1em 0.4em;
+            border-radius: 3px;
+            font-size: 0.6em;
+            margin-right: 0.3em;
+        }
+        
+        .reveal .badge.green { background: rgba(139, 233, 192, 0.3); }
+        .reveal .badge.orange { background: rgba(240, 168, 104, 0.3); }
+    </style>
+</head>
+<body>
+    <div class="reveal">
+        <div class="slides">
+
+            <!-- ===== SECTION: INTRO ===== -->
+            
+            <!-- Title -->
+            <section class="center">
+                <h1>Small Models Running in Your App</h1>
+                <p class="dim">Mobile Warsaw</p>
+                <p style="margin-top: 1em;"><span class="hl">On-device AI without the cloud</span></p>
+                <p class="sub">Press <kbd>S</kbd> for speaker notes</p>
+                <aside class="notes">
+                    <p><strong>Welcome everyone!</strong></p>
+                    <p>Today I'll show you how to run AI models directly on mobile devices.</p>
+                    <p>No cloud, no API costs, full privacy.</p>
+                </aside>
+            </section>
+
+            <!-- Agenda -->
+            <section>
+                <h2>What We'll Cover</h2>
+                <div class="cols">
+                    <div class="card">
+                        <h4>1. The Big Picture</h4>
+                        <p>Why small models matter</p>
+                    </div>
+                    <div class="card">
+                        <h4>2. How They Work</h4>
+                        <p>Transformer basics</p>
+                    </div>
+                </div>
+                <div class="cols">
+                    <div class="card">
+                        <h4>3. Three Demos</h4>
+                        <p>From scratch to production</p>
+                    </div>
+                    <div class="card">
+                        <h4>4. When to Use Them</h4>
+                        <p>Trade-offs & decisions</p>
+                    </div>
+                </div>
+                <aside class="notes">
+                    <p>We'll start with WHY, then HOW, then see real demos.</p>
+                    <p>I'm a developer, not a researcher, so we focus on practical stuff.</p>
+                </aside>
+            </section>
+
+            <!-- ===== SECTION: WHY ===== -->
+
+            <!-- The Problem -->
+            <section>
+                <h2>The Current Reality</h2>
+                <p class="lead">Most apps call <span class="hl">cloud APIs</span> for AI features</p>
+                <div class="cols">
+                    <div class="card">
+                        <h4>Problems with Cloud</h4>
+                        <ul>
+                            <li>Latency: 500ms - 2 seconds</li>
+                            <li>User data leaves the device</li>
+                            <li>Per-token pricing adds up</li>
+                            <li>Requires internet connection</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>Example Scenario</h4>
+                        <p class="example">User: "Set reminder for 5pm"<br>
+                        → Data sent to OpenAI/Google<br>
+                        → Server processes<br>
+                        → Response returns<br>
+                        → Total: ~1 second, ~$0.001</p>
+                    </div>
+                </div>
+                <aside class="notes">
+                    <p>Every time your app calls ChatGPT or Gemini API:</p>
+                    <p>1. User waits ~1 second</p>
+                    <p>2. Their data goes to someone else's server</p>
+                    <p>3. You pay per request</p>
+                    <p>4. Doesn't work in airplane mode</p>
+                </aside>
+            </section>
+
+            <!-- The Insight -->
+            <section>
+                <h2>The Key Insight</h2>
+                <div class="key-point">
+                    <p>Most mobile AI tasks <span class="hl">don't need GPT-4 sized models</span></p>
+                </div>
+                <p class="lead">Think about what your app actually does:</p>
+                <table>
+                    <tr><th>Your App Needs</th><th>Cloud Model?</th><th>On-Device Works?</th></tr>
+                    <tr><td>Parse user commands</td><td class="dim">Overkill</td><td class="green">✓ 100MB</td></tr>
+                    <tr><td>Classify text</td><td class="dim">Overkill</td><td class="green">✓ 10MB</td></tr>
+                    <tr><td>Search similar content</td><td class="dim">Overkill</td><td class="green">✓ 50MB</td></tr>
+                    <tr><td>Generate descriptions</td><td class="dim">Optional</td><td class="green">✓ 300MB</td></tr>
+                    <tr><td>Complex research</td><td class="accent">Yes</td><td class="dim">No</td></tr>
+                </table>
+                <aside class="notes">
+                    <p>Ask yourself: Does my app need to write poetry? Analyze scientific papers?</p>
+                    <p>Most apps just need to: understand commands, classify content, find similar items.</p>
+                    <p>These don't need 1 trillion parameters!</p>
+                </aside>
+            </section>
+
+            <!-- Size Spectrum -->
+            <section>
+                <h2>The Model Size Spectrum</h2>
+                <div class="cols">
+                    <div class="card" style="text-align: center;">
+                        <div class="big">1M</div>
+                        <p class="dim">Parameters</p>
+                        <p>~4MB on disk</p>
+                        <p class="green">Runs anywhere</p>
+                        <p class="sub">Basic patterns</p>
+                    </div>
+                    <div class="card" style="text-align: center;">
+                        <div class="big">100M</div>
+                        <p class="dim">Parameters</p>
+                        <p>~400MB on disk</p>
+                        <p class="green">Mid-range phones</p>
+                        <p class="sub">App commands, VQA</p>
+                    </div>
+                    <div class="card" style="text-align: center;">
+                        <div class="big">1B+</div>
+                        <p class="dim">Parameters</p>
+                        <p>~4GB on disk</p>
+                        <p class="accent">Flagship only</p>
+                        <p class="sub">General chat</p>
+                    </div>
+                </div>
+                <div class="key-point">
+                    <p><span class="badge">KEY</span> Narrow the task → shrink the model</p>
+                </div>
+                <aside class="notes">
+                    <p>1 million parameters = about 4MB. Fits on ANY phone.</p>
+                    <p>100M = about 400MB. Most modern phones can handle this.</p>
+                    <p>1 billion+ = need flagship phone with lots of RAM.</p>
+                    <p>The smaller the task, the smaller the model you need.</p>
+                </aside>
+            </section>
+
+            <!-- ===== SECTION: HOW ===== -->
+
+            <!-- What is a Transformer -->
+            <section>
+                <h2>What Powers These Models?</h2>
+                <p class="lead">The <span class="hl">Transformer</span> architecture</p>
+                <p class="sub">Don't worry - we'll keep it practical, not academic</p>
+                <div class="flow" style="margin: 0.5em 0; font-size: 0.6em;">
+                    <span class="box">Input Text</span>
+                    <span class="arrow">→</span>
+                    <span class="box">Convert to Numbers</span>
+                    <span class="arrow">→</span>
+                    <span class="box">Process Through Layers</span>
+                    <span class="arrow">→</span>
+                    <span class="box">Output</span>
+                </div>
+                <div class="cols">
+                    <div class="card">
+                        <h4>Good News</h4>
+                        <ul>
+                            <li>Same architecture as GPT-4</li>
+                            <li>Just smaller = fewer layers</li>
+                            <li>Core concepts are simple</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>Size Comparison</h4>
+                        <p>GPT-4: ~100+ layers</p>
+                        <p>Tiny model: 2 layers</p>
+                        <p class="sub">Same building blocks, different scale</p>
+                    </div>
+                </div>
+                <aside class="notes">
+                    <p>Transformers power ChatGPT, Gemini, Claude - all of them.</p>
+                    <p>The difference between GPT-4 and a tiny model?</p>
+                    <p>GPT-4 has 100+ layers, tiny has 2. Same recipe, smaller batch.</p>
+                    <p>You don't need to understand all the math to use them.</p>
+                </aside>
+            </section>
+
+            <!-- Core Components -->
+            <section>
+                <h2>Three Core Components</h2>
+                <div class="card">
+                    <h4>1. Embeddings <span class="badge">Foundation</span></h4>
+                    <p>Convert words into number vectors</p>
+                    <p class="example">"cat" → [0.23, -0.45, 0.12, ...]</p>
+                </div>
+                <div class="card">
+                    <h4>2. Attention <span class="badge">The Magic</span></h4>
+                    <p>Each word "looks at" all other words for context</p>
+                </div>
+                <div class="card">
+                    <h4>3. Feed-Forward <span class="badge">Where Params Live</span></h4>
+                    <p>Simple neural network that processes the information</p>
+                </div>
+                <aside class="notes">
+                    <p>Three things you need to know:</p>
+                    <p>1. EMBEDDINGS: Words become numbers. Similar words = similar numbers.</p>
+                    <p>2. ATTENTION: Words can "see" each other. "Bank" knows if it's near "river" or "money".</p>
+                    <p>3. FEED-FORWARD: This is where most parameters live. It's just matrix multiplication.</p>
+                </aside>
+            </section>
+
+            <!-- Embeddings Detail -->
+            <section>
+                <h2>Embeddings in Practice</h2>
+                <p class="lead">Words become <span class="hl">coordinate points</span> in space</p>
+                <pre><code class="language-plaintext">Word        Vector (simplified)
+─────────────────────────────────
+"cat"       [0.23, -0.45, 0.12]
+"feline"    [0.25, -0.42, 0.15]  ← Very similar!
+"dog"       [-0.60, 0.30, -0.22] ← Different
+"car"       [-0.90, 0.80, 0.50]  ← Very different</code></pre>
+                <div class="key-point">
+                    <p><span class="badge green">Result</span> Similar meanings → close coordinates</p>
+                    <p>This enables: search, similarity, recommendations</p>
+                </div>
+                <aside class="notes">
+                    <p>Think of embeddings as GPS coordinates for words.</p>
+                    <p>"Cat" and "feline" are neighbors - same neighborhood.</p>
+                    <p>"Cat" and "car" are far apart - different cities.</p>
+                    <p>This is why embeddings power search and recommendations.</p>
+                </aside>
+            </section>
+
+            <!-- Attention Detail -->
+            <section>
+                <h2>Attention: Understanding Context</h2>
+                <div class="example">
+                    <p>"I went to the <span class="hl">bank</span> to deposit money"</p>
+                    <p>"I went to the <span class="hl">bank</span> to fish"</p>
+                </div>
+                <p class="lead">Same word "bank" — different meaning</p>
+                <div class="card">
+                    <h4>How Attention Solves This</h4>
+                    <ul>
+                        <li>"bank" looks at "deposit money" → financial bank</li>
+                        <li>"bank" looks at "fish" → river bank</li>
+                        <li>Each word "attends" to relevant context</li>
+                    </ul>
+                </div>
+                <p class="sub">This is why transformers understand language so well</p>
+                <aside class="notes">
+                    <p>ATTENTION is the breakthrough that made modern AI possible.</p>
+                    <p>The word "bank" doesn't know what it means by itself.</p>
+                    <p>But it can "look at" other words in the sentence.</p>
+                    <p>Near "deposit money"? It's a financial bank.</p>
+                    <p>Near "fish"? It's a river bank.</p>
+                </aside>
+            </section>
+
+            <!-- Efficiency -->
+            <section>
+                <h2>Making Models Smaller</h2>
+                <p class="lead">Three techniques to shrink models</p>
+                <div class="cols">
+                    <div class="card">
+                        <h4>Quantization</h4>
+                        <p>Store numbers in less space</p>
+                        <p><code>FP32 → INT4</code></p>
+                        <p class="green">4× smaller</p>
+                        <p class="sub">Minimal quality loss</p>
+                    </div>
+                    <div class="card">
+                        <h4>Weight Tying</h4>
+                        <p>Reuse same weights</p>
+                        <p>Input = Output embeddings</p>
+                        <p class="green">2× smaller</p>
+                        <p class="sub">No quality loss</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <h4>Pruning</h4>
+                    <p>Remove connections that don't matter much</p>
+                    <p class="green">Up to 90% smaller</p>
+                    <p class="sub">Like trimming a tree</p>
+                </div>
+                <aside class="notes">
+                    <p>QUANTIZATION: Normal models use 32-bit numbers. We can use 4-bit.</p>
+                    <p>That's 8× fewer bits per number. Makes models 4× smaller with minimal impact.</p>
+                    <p>WEIGHT TYING: The input and output use similar math. Share the weights.</p>
+                    <p>PRUNING: Neural networks have many connections. Many are almost zero. Remove them.</p>
+                </aside>
+            </section>
+
+            <!-- ===== SECTION: DEMO 1 ===== -->
+
+            <!-- Demo 1 Intro -->
+            <section>
+                <h2>Demo 1: Build From Scratch</h2>
+                <div class="demo-box">
+                    <div class="big">~0.02M</div>
+                    <p class="dim">20,000 parameters • ~80KB</p>
+                    <p>Train in <span class="hl">2-3 minutes</span> on laptop</p>
+                </div>
+                <div class="cols">
+                    <div>
+                        <h4>The Goal</h4>
+                        <ul>
+                            <li>Show it's just code, not magic</li>
+                            <li>Same architecture as GPT</li>
+                            <li>~150 lines of Python</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4>Architecture</h4>
+                        <ul>
+                            <li>2 transformer layers</li>
+                            <li>2 attention heads</li>
+                            <li>128 embedding dimension</li>
+                        </ul>
+                    </div>
+                </div>
+                <aside class="notes">
+                    <p>First demo: I'll show you how to BUILD a tiny transformer.</p>
+                    <p>Why? To demystify it. It's not magic, it's math and code.</p>
+                    <p>This model has 20,000 parameters. GPT-4 has trillions.</p>
+                    <p>But it uses the EXACT same architecture.</p>
+                    <p>Trains in minutes, not months. Let's look at the code.</p>
+                </aside>
+            </section>
+
+            <!-- Demo 1 Code -->
+            <section>
+                <h2>Tiny Transformer Code</h2>
+                <p class="sub">The core is surprisingly simple</p>
+                <pre><code class="language-python">class TinyTransformer(nn.Module):
+    def __init__(self):
+        self.tok_emb = nn.Embedding(vocab_size, 128)
+        self.pos_emb = nn.Embedding(128, 128)
+        self.blocks = nn.Sequential(
+            Block(128, 2),  # Layer 1
+            Block(128, 2)   # Layer 2
+        )
+        self.head = nn.Linear(128, vocab_size)
+
+    def forward(self, x):
+        tok = self.tok_emb(x)
+        pos = self.pos_emb(torch.arange(len(x)))
+        x = self.blocks(tok + pos)
+        return self.head(x)</code></pre>
+                <p class="key-point"><span class="badge">That's it!</span> The rest is just training loops</p>
+                <aside class="notes">
+                    <p>This is the whole model definition. About 10 lines.</p>
+                    <p>tok_emb: converts tokens to vectors</p>
+                    <p>pos_emb: adds position information</p>
+                    <p>blocks: the transformer layers</p>
+                    <p>head: converts back to vocabulary</p>
+                    <p>The full training script is in demo1 folder.</p>
+                </aside>
+            </section>
+
+            <!-- ===== SECTION: DEMO 2 ===== -->
+
+            <!-- Demo 2 Intro -->
+            <section>
+                <h2>Demo 2: Function Calling</h2>
+                <p class="lead">The #1 use case for mobile AI</p>
+                <div class="example">
+                    <p>User: <span class="hl">"Set a reminder for tomorrow at 5pm"</span></p>
+                    <p>Model: <span class="green">set_reminder(title="...", time="tomorrow 5pm")</span></p>
+                </div>
+                <div class="cols">
+                    <div class="card">
+                        <h4>Why This Matters</h4>
+                        <ul>
+                            <li>Natural language → API calls</li>
+                            <li>No complex parsing code</li>
+                            <li>Works with your existing APIs</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>The Model: Gemma 270M</h4>
+                        <p>270M parameters (~288MB)</p>
+                        <p>Fine-tuned for function calling</p>
+                        <p class="accent">58% → 85% accuracy</p>
+                    </div>
+                </div>
+                <aside class="notes">
+                    <p>Function calling is THE killer feature for mobile AI.</p>
+                    <p>Instead of writing regex parsers for "set alarm", "remind me", "create reminder"...</p>
+                    <p>Just let the model figure it out.</p>
+                    <p>Gemma 270M is Google's smallest instruction-tuned model.</p>
+                    <p>Fine-tuned specifically for this task.</p>
+                </aside>
+            </section>
+
+            <!-- Demo 2 How It Works -->
+            <section>
+                <h2>How Function Calling Works</h2>
+                <div class="flow" style="font-size: 0.55em; margin: 0.5em 0;">
+                    <span class="box">"Remind me to call mom"</span>
+                    <span class="arrow">→</span>
+                    <span class="box">Tokenizer</span>
+                    <span class="arrow">→</span>
+                    <span class="box">Gemma 270M</span>
+                    <span class="arrow">→</span>
+                    <span class="box" style="background: rgba(139, 233, 192, 0.2);">set_reminder{...}</span>
+                </div>
+                <div class="cols">
+                    <div class="card">
+                        <h4>Training Data</h4>
+                        <pre><code class="language-json">{
+  "user": "Remind me at 5pm",
+  "function": "set_reminder",
+  "params": {"time": "5pm"}
+}</code></pre>
+                    </div>
+                    <div class="card">
+                        <h4>Supported Functions</h4>
+                        <ul>
+                            <li>set_reminder(title, time)</li>
+                            <li>navigate_to_screen(screen)</li>
+                            <li>toggle_setting(setting, enabled)</li>
+                            <li>send_message(contact, text)</li>
+                        </ul>
+                    </div>
+                </div>
+                <aside class="notes">
+                    <p>The model is trained on pairs of: user text + function call.</p>
+                    <p>It learns: "remind me" → set_reminder function.</p>
+                    <p>"navigate", "go to", "open" → navigate_to_screen.</p>
+                    <p>Your app defines the functions. Model maps text to them.</p>
+                </aside>
+            </section>
+
+            <!-- Demo 2 Specs -->
+            <section>
+                <h2>Gemma 270M Specifications</h2>
+                <div class="demo-box">
+                    <div class="big">270M</div>
+                    <p>Parameters • ~288MB (INT4 quantized)</p>
+                </div>
+                <div class="cols">
+                    <table>
+                        <tr><th>Spec</th><th>Value</th></tr>
+                        <tr><td>Context Length</td><td>32K tokens</td></tr>
+                        <tr><td>Inference Speed</td><td>~126 tok/s</td></tr>
+                        <tr><td>Time to First Token</td><td>~0.3s</td></tr>
+                        <tr><td>RAM Usage</td><td>~551MB</td></tr>
+                    </table>
+                    <div class="card">
+                        <h4>Device Requirements</h4>
+                        <ul>
+                            <li>Mid-range+ Android phone</li>
+                            <li>iPhone 12 or newer</li>
+                            <li>~500MB free RAM</li>
+                        </ul>
+                    </div>
+                </div>
+                <aside class="notes">
+                    <p>288MB on disk. That's smaller than many apps!</p>
+                    <p>Generates 126 tokens per second - very fast.</p>
+                    <p>First response in 0.3 seconds - feels instant.</p>
+                    <p>Runs on mid-range Android, iPhone 12+.</p>
+                </aside>
+            </section>
+
+            <!-- ===== SECTION: DEMO 3 ===== -->
+
+            <!-- Demo 3 Intro -->
+            <section>
+                <h2>Demo 3: Visual LLM</h2>
+                <p class="lead">Image understanding on-device</p>
+                <div class="cols">
+                    <div class="card">
+                        <h4>What VLMs Do</h4>
+                        <ul>
+                            <li>Describe images in text</li>
+                            <li>Answer questions about images</li>
+                            <li>Detect objects</li>
+                            <li>Understand scenes</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>Architecture</h4>
+                        <div class="flow" style="font-size: 0.8em;">
+                            <span class="box">Image</span>
+                            <span class="arrow">→</span>
+                            <span class="box">Vision Encoder</span>
+                            <span class="arrow">→</span>
+                            <span class="box">Projector</span>
+                            <span class="arrow">→</span>
+                            <span class="box">LLM</span>
+                        </div>
+                        <p class="sub">Image → visual features → language space → text</p>
+                    </div>
+                </div>
+                <aside class="notes">
+                    <p>VLM = Vision Language Model.</p>
+                    <p>It can "see" images and talk about them.</p>
+                    <p>Architecture: Image goes through a vision encoder (like CLIP), then projected to language space, then LLM generates text.</p>
+                    <p>Use cases: accessibility, photo search, content moderation.</p>
+                </aside>
+            </section>
+
+            <!-- Demo 3 Size Comparison -->
+            <section>
+                <h2>VLM Size vs Quality</h2>
+                <table>
+                    <tr><th>Size</th><th>Params</th><th>Quality</th><th>Use Case</th></tr>
+                    <tr><td class="green">10-50MB</td><td>1-10M</td><td>Basic</td><td>Classification</td></tr>
+                    <tr><td class="green">100-300MB</td><td>100-300M</td><td>Good</td><td>Captioning, VQA</td></tr>
+                    <tr><td class="accent">500MB+</td><td>500M+</td><td>Great</td><td>Complex reasoning</td></tr>
+                </table>
+                <div class="key-point">
+                    <p><span class="badge orange">Trade-off</span> Larger models = better descriptions but need more RAM</p>
+                </div>
+                <div class="card">
+                    <h4>For Mobile</h4>
+                    <p>100-300MB models hit the sweet spot: good quality, runs on most phones</p>
+                </div>
+                <aside class="notes">
+                    <p>Smaller VLMs can classify images - "this is a cat".</p>
+                    <p>Medium ones can caption - "a cat sitting on a sofa".</p>
+                    <p>Large ones can reason - "the cat appears to be waiting for its owner".</p>
+                    <p>For mobile, 100-300MB is the practical limit for most users.</p>
+                </aside>
+            </section>
+
+            <!-- ===== SECTION: DEPLOYMENT ===== -->
+
+            <!-- Mobile Requirements -->
+            <section>
+                <h2>Running on Mobile</h2>
+                <table>
+                    <tr><th>Model Size</th><th>RAM Needed</th><th>Works On</th></tr>
+                    <tr><td>10MB</td><td>100MB</td><td class="green">All phones</td></tr>
+                    <tr><td>100MB</td><td>500MB</td><td class="green">Mid-range+</td></tr>
+                    <tr><td>300MB</td><td>1GB</td><td class="accent">Flagships</td></tr>
+                    <tr><td>1GB+</td><td>2GB+</td><td class="dim">High-end only</td></tr>
+                </table>
+                <div class="cols">
+                    <div class="card">
+                        <h4>Rule of Thumb</h4>
+                        <p>Model size × 3 = RAM needed</p>
+                        <p class="sub">100MB model → ~300MB RAM minimum</p>
+                    </div>
+                    <div class="card">
+                        <h4>Battery Impact</h4>
+                        <p>~0.03% per inference</p>
+                        <p class="sub">Negligible for typical usage</p>
+                    </div>
+                </div>
+                <aside class="notes">
+                    <p>Key insight: RAM is the limiting factor, not storage.</p>
+                    <p>Rule of thumb: model size × 3 for RAM.</p>
+                    <p>Why? Model weights + activations + overhead.</p>
+                    <p>100MB model is safe for most modern phones.</p>
+                    <p>Battery impact is minimal - less than video playback.</p>
+                </aside>
+            </section>
+
+            <!-- Deployment Options -->
+            <section>
+                <h2>How to Deploy</h2>
+                <div class="cols">
+                    <div class="card">
+                        <h4>MediaPipe <span class="badge green">Recommended</span></h4>
+                        <p>Google's official SDK</p>
+                        <p>Android, iOS, Web</p>
+                        <p>Built-in model support</p>
+                    </div>
+                    <div class="card">
+                        <h4>LiteRT / TFLite</h4>
+                        <p>TensorFlow Lite runtime</p>
+                        <p>Cross-platform</p>
+                        <p>Widely supported</p>
+                    </div>
+                </div>
+                <div class="cols">
+                    <div class="card">
+                        <h4>llama.cpp</h4>
+                        <p>Efficient CPU inference</p>
+                        <p>Good for quantized models</p>
+                    </div>
+                    <div class="card">
+                        <h4>ONNX Runtime</h4>
+                        <p>Cross-platform</p>
+                        <p>Hardware acceleration</p>
+                    </div>
+                </div>
+                <aside class="notes">
+                    <p>MediaPipe is Google's solution - easiest for Android/iOS.</p>
+                    <p>Supports Gemma, Phi, and other models out of the box.</p>
+                    <p>TFLite/LiteRT is more flexible, requires more setup.</p>
+                    <p>llama.cpp is great for CPU-only, quantized models.</p>
+                    <p>ONNX works well with hardware acceleration (GPU/NPU).</p>
+                </aside>
+            </section>
+
+            <!-- ===== SECTION: COMPARISON ===== -->
+
+            <!-- Cloud vs On-Device -->
+            <section>
+                <h2>Cloud vs On-Device</h2>
+                <table>
+                    <tr><th>Factor</th><th>On-Device</th><th>Cloud API</th></tr>
+                    <tr><td>Latency</td><td class="green">~300ms</td><td class="dim">500ms-2s</td></tr>
+                    <tr><td>Privacy</td><td class="green">100% local</td><td class="dim">Sent to server</td></tr>
+                    <tr><td>Offline</td><td class="green">✓ Works</td><td class="dim">✗ No</td></tr>
+                    <tr><td>Cost</td><td class="green">Free</td><td class="dim">$0.001-0.01/request</td></tr>
+                    <tr><td>Quality</td><td class="accent">Good (85%)</td><td class="dim">Best (95%)</td></tr>
+                    <tr><td>Model Size</td><td class="accent">Limited</td><td class="dim">Unlimited</td></tr>
+                </table>
+                <aside class="notes">
+                    <p>Let's compare the trade-offs honestly.</p>
+                    <p>On-device wins on: latency, privacy, offline, cost.</p>
+                    <p>Cloud wins on: quality, model flexibility.</p>
+                    <p>For most mobile apps, 85% accuracy is plenty.</p>
+                    <p>And you get instant response, no API costs, full privacy.</p>
+                </aside>
+            </section>
+
+            <!-- When to Use Each -->
+            <section>
+                <h2>When to Use What</h2>
+                <div class="card">
+                    <h4 class="green">Use On-Device When:</h4>
+                    <ul>
+                        <li>Task is well-defined (commands, classification, search)</li>
+                        <li>Privacy is important (health, finance apps)</li>
+                        <li>Offline support matters</li>
+                        <li>Cost sensitivity (many requests)</li>
+                        <li>Low latency required (<500ms)</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h4 class="accent">Use Cloud When:</h4>
+                    <ul>
+                        <li>Need best possible quality</li>
+                        <li>Complex reasoning required</li>
+                        <li>Large context needed (long documents)</li>
+                        <li>Request volume is low</li>
+                    </ul>
+                </div>
+                <aside class="notes">
+                    <p>Use on-device for: voice commands, text classification, semantic search, recommendations.</p>
+                    <p>Use cloud for: complex analysis, research assistance, very long context.</p>
+                    <p>You can also HYBRID: on-device for simple stuff, cloud for complex.</p>
+                </aside>
+            </section>
+
+            <!-- ===== SECTION: SUMMARY ===== -->
+
+            <!-- Key Takeaways -->
+            <section class="center">
+                <h2>Key Takeaways</h2>
+                <div class="cols">
+                    <div class="card">
+                        <div class="big">1</div>
+                        <p>You can <span class="hl">build this</span></p>
+                        <p class="sub">~150 lines of code</p>
+                    </div>
+                    <div class="card">
+                        <div class="big">2</div>
+                        <p>Size <span class="hl">matters</span></p>
+                        <p class="sub">Match model to task</p>
+                    </div>
+                    <div class="card">
+                        <div class="big">3</div>
+                        <p>Privacy <span class="hl">wins</span></p>
+                        <p class="sub">Data stays on device</p>
+                    </div>
+                </div>
+                <div class="cols">
+                    <div class="card">
+                        <div class="big">4</div>
+                        <p>Works <span class="hl">offline</span></p>
+                        <p class="sub">No internet needed</p>
+                    </div>
+                    <div class="card">
+                        <div class="big">5</div>
+                        <p>Zero <span class="hl">cost</span></p>
+                        <p class="sub">No API fees</p>
+                    </div>
+                    <div class="card">
+                        <div class="big">6</div>
+                        <p>Better <span class="hl">UX</span></p>
+                        <p class="sub">&lt;300ms response</p>
+                    </div>
+                </div>
+                <aside class="notes">
+                    <p>Let me summarize:</p>
+                    <p>1. This isn't magic - you can understand and build it.</p>
+                    <p>2. Don't over-engineer - small models for focused tasks.</p>
+                    <p>3. Your users' data never leaves their phone.</p>
+                    <p>4. Works in airplane mode.</p>
+                    <p>5. No surprise API bills.</p>
+                    <p>6. Instant response = better user experience.</p>
+                </aside>
+            </section>
+
+            <!-- Resources -->
+            <section>
+                <h2>Resources</h2>
+                <div class="cols">
+                    <div class="card">
+                        <h4>Learn More</h4>
+                        <ul>
+                            <li>NanoGPT (Karpathy)</li>
+                            <li>Google Gemma docs</li>
+                            <li>Attention Is All You Need (paper)</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>Start Building</h4>
+                        <ul>
+                            <li>MediaPipe LLM Inference</li>
+                            <li>llama.cpp for mobile</li>
+                            <li>TensorFlow Lite</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="demo-box">
+                    <h4>Today's Demos</h4>
+                    <code>demo1_tiny_transformer/</code> • <code>demo2_function_gemma/</code> • <code>demo3_visual_llm/</code>
+                </div>
+                <aside class="notes">
+                    <p>NanoGPT is the best way to learn - Andrej Karpathy's minimal GPT.</p>
+                    <p>Gemma models are free and well-documented.</p>
+                    <p>MediaPipe is the easiest way to start on Android/iOS.</p>
+                    <p>All demos are in the project folder - ready to run.</p>
+                </aside>
+            </section>
+
+            <!-- Q&A -->
+            <section class="center">
+                <h1>Questions?</h1>
+                <p class="dim" style="margin-top: 1em;">Thank you!</p>
+                <aside class="notes">
+                    <p>Open for questions.</p>
+                    <p>Happy to discuss specific use cases or implementation details.</p>
+                </aside>
+            </section>
+
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/reveal.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/plugin/highlight/highlight.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/plugin/notes/notes.js"></script>
+    <script>
+        Reveal.initialize({
+            hash: true,
+            slideNumber: 'c/t',
+            transition: 'slide',
+            embedded: false,
+            plugins: [ RevealHighlight, RevealNotes ]
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,168 @@
+# Mobile Warsaw: Small Models Running in Your App
+
+## Complete Demo Guide with Jetpack Compose
+
+This guide contains three complementary demos showing the full spectrum of on-device AI—from training a tiny model to deploying production-ready models with function calling capabilities.
+
+---
+
+## Demo 1: Train a Tiny Transformer & Deploy to Android
+
+**Model Size:** ~5-10MB  
+**Training Time:** 2-3 minutes on laptop  
+**Purpose:** Show that you can build and train models from scratch
+
+### Step 1: Train the Tiny Transformer (Laptop)
+
+Create `tiny_transformer_train.py`:
+
+```python
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+import math
+
+# Hyperparameters - KEEP IT TINY FOR MOBILE
+block_size = 128
+batch_size = 32
+n_layer = 2      # Only 2 transformer blocks!
+n_head = 2       # Only 2 attention heads
+n_embd = 128     # Small embedding dimension
+dropout = 0.1
+max_iters = 2000
+lr = 3e-3
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
+# Sample training data (Shakespeare excerpt)
+text = """From fairest creatures we desire increase,
+That thereby beauty's rose might never die,
+But as the riper should by time decease,
+His tender heir might bear his memory."""
+
+chars = sorted(list(set(text)))
+vocab_size = len(chars)
+stoi = {ch:i for i,ch in enumerate(chars)}
+itos = {i:ch for ch,i in stoi.items()}
+
+encode = lambda s: torch.tensor([stoi[c] for c in s], dtype=torch.long)
+decode = lambda t: ''.join([itos[int(i)] for i in t])
+
+data = torch.tensor(encode(text), dtype=torch.long)
+n = int(0.9 * len(data))
+train_data = data[:n]
+val_data = data[n:]
+
+def get_batch(split):
+    data = train_data if split == 'train' else val_data
+    ix = torch.randint(len(data) - block_size, (batch_size,))
+    x = torch.stack([data[i:i+block_size] for i in ix])
+    y = torch.stack([data[i+1:i+block_size+1] for i in ix])
+    return x.to(device), y.to(device)
+
+class CausalSelfAttention(nn.Module):
+    def __init__(self, n_embd, n_head, dropout):
+        super().__init__()
+        self.n_head = n_head
+        self.key = nn.Linear(n_embd, n_embd, bias=False)
+        self.query = nn.Linear(n_embd, n_embd, bias=False)
+        self.value = nn.Linear(n_embd, n_embd, bias=False)
+        self.proj = nn.Linear(n_embd, n_embd, bias=False)
+        self.attn_drop = nn.Dropout(dropout)
+        self.resid_drop = nn.Dropout(dropout)
+        self.register_buffer('mask', torch.tril(torch.ones(block_size, block_size))
+                             .view(1,1,block_size,block_size))
+
+    def forward(self, x):
+        B, T, C = x.size()
+        k = self.key(x).view(B, T, self.n_head, C//self.n_head).transpose(1,2)
+        q = self.query(x).view(B, T, self.n_head, C//self.n_head).transpose(1,2)
+        v = self.value(x).view(B, T, self.n_head, C//self.n_head).transpose(1,2)
+        att = (q @ k.transpose(-2, -1)) / math.sqrt(k.size(-1))
+        att = att.masked_fill(self.mask[:,:,:T,:T]==0, float('-inf'))
+        att = F.softmax(att, dim=-1)
+        att = self.attn_drop(att)
+        y = att @ v
+        y = y.transpose(1,2).contiguous().view(B, T, C)
+        return self.resid_drop(self.proj(y))
+
+class MLP(nn.Module):
+    def __init__(self, n_embd, dropout):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(n_embd, 4*n_embd),
+            nn.GELU(),
+            nn.Linear(4*n_embd, n_embd),
+            nn.Dropout(dropout),
+        )
+    def forward(self, x): return self.net(x)
+
+class Block(nn.Module):
+    def __init__(self, n_embd, n_head, dropout):
+        super().__init__()
+        self.ln1 = nn.LayerNorm(n_embd)
+        self.attn = CausalSelfAttention(n_embd, n_head, dropout)
+        self.ln2 = nn.LayerNorm(n_embd)
+        self.mlp = MLP(n_embd, dropout)
+    def forward(self, x):
+        x = x + self.attn(self.ln1(x))
+        x = x + self.mlp(self.ln2(x))
+        return x
+
+class TinyTransformer(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.tok_emb = nn.Embedding(vocab_size, n_embd)
+        self.pos_emb = nn.Embedding(block_size, n_embd)
+        self.drop = nn.Dropout(dropout)
+        self.blocks = nn.Sequential(*[Block(n_embd, n_head, dropout) for _ in range(n_layer)])
+        self.ln_f = nn.LayerNorm(n_embd)
+        self.head = nn.Linear(n_embd, vocab_size, bias=False)
+        self.head.weight = self.tok_emb.weight  # Weight tying
+
+    def forward(self, idx, targets=None):
+        B, T = idx.shape
+        tok = self.tok_emb(idx)
+        pos = self.pos_emb(torch.arange(T, device=idx.device))
+        x = self.drop(tok + pos)
+        x = self.blocks(x)
+        x = self.ln_f(x)
+        logits = self.head(x)
+        loss = None
+        if targets is not None:
+            loss = F.cross_entropy(logits.view(-1, logits.size(-1)), targets.view(-1))
+        return logits, loss
+
+    @torch.no_grad()
+    def generate(self, idx, max_new_tokens):
+        for _ in range(max_new_tokens):
+            idx_cond = idx[:, -block_size:]
+            logits, _ = self(idx_cond)
+            logits = logits[:, -1, :]
+            probs = F.softmax(logits, dim=-1)
+            next_id = torch.multinomial(probs, num_samples=1)
+            idx = torch.cat((idx, next_id), dim=1)
+        return idx
+
+# Train the model
+model = TinyTransformer().to(device)
+optimizer = torch.optim.AdamW(model.parameters(), lr=lr)
+
+print("Training tiny transformer...")
+for it in range(max_iters+1):
+    xb, yb = get_batch('train')
+    logits, loss = model(xb, yb)
+    optimizer.zero_grad(set_to_none=True)
+    loss.backward()
+    torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+    optimizer.step()
+    if it % 500 == 0:
+        print(f"Step {it}: loss = {loss.item():.4f}")
+
+# Save the model
+torch.save(model.state_dict(), 'tiny_transformer.pt')
+print("Model saved! Size:", f"{sum(p.numel() for p in model.parameters())/1e6:.2f}M parameters")
+
+# Test generation
+context = torch.zeros((1,1), dtype=torch.long, device=device)
+sample = model.generate(context, max_new_tokens=100)[0].tolist()
+print("Generated:", decode(sample))
