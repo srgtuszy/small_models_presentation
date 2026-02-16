@@ -10,9 +10,6 @@ Press `F5` or go to **Run and Debug** panel → Select configuration → Click r
 | ▶ Demo 2: Desktop Debug | Launch app with Kotlin debugger |
 | ▶ Demo 2: Android Debug | Boot emulator → build → install → launch → attach debugger |
 | ▶ Demo 2: iOS Debug | Boot simulator → build XCFramework → build app → launch → attach debugger |
-| ▶ Demo 3: Desktop Debug | Launch app with Kotlin debugger |
-| ▶ Demo 3: Android Debug | Boot emulator → build → install → launch → attach debugger |
-| ▶ Demo 3: iOS Debug | Boot simulator → build XCFramework → build app → launch → attach debugger |
 | 📽 Slides: Open Presentation | Start server → open browser |
 
 ---
@@ -95,8 +92,6 @@ small_models/
 │           ├── iOSApp.swift
 │           ├── ContentView.swift
 │           └── Info.plist
-├── demo3_visual_llm/
-│   └── (same structure)
 ├── slides/
 │   └── index.html
 ├── TALKING_POINTS.md
@@ -113,19 +108,19 @@ cd demo1_tiny_transformer
 python3 tiny_transformer_train.py
 ```
 
-### Demo 2 & 3: Desktop
+### Demo 2: Desktop
 ```bash
 cd demo2_function_gemma
 ./gradlew run
 ```
 
-### Demo 2 & 3: Android
+### Demo 2: Android
 ```bash
 cd demo2_function_gemma
 ./gradlew :composeApp:installDebug
 ```
 
-### Demo 2 & 3: iOS
+### Demo 2: iOS
 ```bash
 cd demo2_function_gemma
 

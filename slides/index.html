@@ -252,7 +252,7 @@
                 </div>
                 <div class="cols">
                     <div class="card">
-                        <h4>3. Three Demos</h4>
+                        <h4>3. Two Demos</h4>
                         <p>From scratch to production</p>
                     </div>
                     <div class="card">
@@ -678,71 +678,9 @@
                 </aside>
             </section>
 
-            <!-- ===== SECTION: DEMO 3 ===== -->
+<!-- ===== SECTION: DEPLOYMENT ===== -->
 
-            <!-- Demo 3 Intro -->
-            <section>
-                <h2>Demo 3: Visual LLM</h2>
-                <p class="lead">Image understanding on-device</p>
-                <div class="cols">
-                    <div class="card">
-                        <h4>What VLMs Do</h4>
-                        <ul>
-                            <li>Describe images in text</li>
-                            <li>Answer questions about images</li>
-                            <li>Detect objects</li>
-                            <li>Understand scenes</li>
-                        </ul>
-                    </div>
-                    <div class="card">
-                        <h4>Architecture</h4>
-                        <div class="flow" style="font-size: 0.8em;">
-                            <span class="box">Image</span>
-                            <span class="arrow">→</span>
-                            <span class="box">Vision Encoder</span>
-                            <span class="arrow">→</span>
-                            <span class="box">Projector</span>
-                            <span class="arrow">→</span>
-                            <span class="box">LLM</span>
-                        </div>
-                        <p class="sub">Image → visual features → language space → text</p>
-                    </div>
-                </div>
-                <aside class="notes">
-                    <p>VLM = Vision Language Model.</p>
-                    <p>It can "see" images and talk about them.</p>
-                    <p>Architecture: Image goes through a vision encoder (like CLIP), then projected to language space, then LLM generates text.</p>
-                    <p>Use cases: accessibility, photo search, content moderation.</p>
-                </aside>
-            </section>
-
-            <!-- Demo 3 Size Comparison -->
-            <section>
-                <h2>VLM Size vs Quality</h2>
-                <table>
-                    <tr><th>Size</th><th>Params</th><th>Quality</th><th>Use Case</th></tr>
-                    <tr><td class="green">10-50MB</td><td>1-10M</td><td>Basic</td><td>Classification</td></tr>
-                    <tr><td class="green">100-300MB</td><td>100-300M</td><td>Good</td><td>Captioning, VQA</td></tr>
-                    <tr><td class="accent">500MB+</td><td>500M+</td><td>Great</td><td>Complex reasoning</td></tr>
-                </table>
-                <div class="key-point">
-                    <p><span class="badge orange">Trade-off</span> Larger models = better descriptions but need more RAM</p>
-                </div>
-                <div class="card">
-                    <h4>For Mobile</h4>
-                    <p>100-300MB models hit the sweet spot: good quality, runs on most phones</p>
-                </div>
-                <aside class="notes">
-                    <p>Smaller VLMs can classify images - "this is a cat".</p>
-                    <p>Medium ones can caption - "a cat sitting on a sofa".</p>
-                    <p>Large ones can reason - "the cat appears to be waiting for its owner".</p>
-                    <p>For mobile, 100-300MB is the practical limit for most users.</p>
-                </aside>
-            </section>
-
-            <!-- ===== SECTION: DEPLOYMENT ===== -->
-
-            <!-- Mobile Requirements -->
+<!-- Mobile Requirements -->
             <section>
                 <h2>Running on Mobile</h2>
                 <table>
@@ -936,7 +874,7 @@
                 </div>
                 <div class="demo-box">
                     <h4>Today's Demos</h4>
-                    <code>demo1_tiny_transformer/</code> • <code>demo2_function_gemma/</code> • <code>demo3_visual_llm/</code>
+                    <code>demo1_tiny_transformer/</code> • <code>demo2_function_gemma/</code>
                 </div>
                 <aside class="notes">
                     <p>NanoGPT is the best way to learn - Andrej Karpathy's minimal GPT.</p>

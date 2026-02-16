@@ -63,21 +63,6 @@ fun App() {
             )
         )
         
-        val replyTool = Tool(
-            name = "reply",
-            description = "Send a text response to the user for normal conversation",
-            parameters = mapOf(
-                "type" to "object",
-                "properties" to mapOf(
-                    "text" to mapOf(
-                        "type" to "string",
-                        "description" to "The text to send to the user"
-                    )
-                ),
-                "required" to listOf("text")
-            )
-        )
-        
         LaunchedEffect(Unit) {
             val error = llmEngine.initialize()
             modelStatus = if (error == null) {

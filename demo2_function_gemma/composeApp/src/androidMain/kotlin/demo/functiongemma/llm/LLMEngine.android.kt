@@ -67,17 +67,12 @@ class AndroidLLMEngine(private val context: Context) : LLMEngine {
             currentSystemPrompt = buildSystemPrompt(tools)
             val prompt = buildFunctionGemmaPrompt(userMessage, tools)
             
-            android.util.Log.d("FunctionGemma", "=== PROMPT START ===")
-            android.util.Log.d("FunctionGemma", prompt)
-            android.util.Log.d("FunctionGemma", "=== PROMPT END ===")
-            
             val lowerMsg = userMessage.lowercase()
             val isAlertRequest = lowerMsg.contains("alert") || lowerMsg.contains("show") || 
                                 lowerMsg.contains("display") || lowerMsg.contains("popup")
             
             if (isAlertRequest) {
                 val msgContent = extractMessageContent(userMessage)
-                android.util.Log.d("FunctionGemma", "Direct alert request, message: $msgContent")
                 return@withContext LLMResponse.FunctionCall(
                     FunctionCallResult("show_alert", mapOf("message" to msgContent))
                 )
@@ -86,7 +81,6 @@ class AndroidLLMEngine(private val context: Context) : LLMEngine {
             val processResult = llama!!.processUserPrompt(prompt, MAX_TOKENS)
             
             if (processResult.isNotEmpty() && processResult.startsWith("Error")) {
-                android.util.Log.e("FunctionGemma", "Process error: $processResult")
                 return@withContext LLMResponse.Error(processResult)
             }
             
@@ -102,13 +96,8 @@ class AndroidLLMEngine(private val context: Context) : LLMEngine {
                 if (result.length > 200) break
             }
             
-            android.util.Log.d("FunctionGemma", "=== RESPONSE START ===")
-            android.util.Log.d("FunctionGemma", result.toString())
-            android.util.Log.d("FunctionGemma", "=== RESPONSE END ===")
-            
             parseFunctionGemmaResponse(result.toString())
         } catch (e: Exception) {
-            android.util.Log.e("FunctionGemma", "Exception", e)
             e.printStackTrace()
             LLMResponse.Error("Generation failed: ${e.message}")
         }
@@ -119,53 +108,36 @@ class AndroidLLMEngine(private val context: Context) : LLMEngine {
     }
     
     private fun buildFunctionGemmaPrompt(userMessage: String, tools: List<Tool>): String {
-        val lowerMsg = userMessage.lowercase()
-        val isAlertRequest = lowerMsg.contains("alert") || lowerMsg.contains("show") || 
-                            lowerMsg.contains("display") || lowerMsg.contains("popup")
-        
-        return if (isAlertRequest) {
-            val msgContent = extractMessageContent(userMessage)
-            "<bos><start_of_turn>user\nShow alert: $msgContent<end_of_turn>\n<start_of_turn>model\n{\"call\":\"show_alert\",\"msg\":\"$msgContent\"}"
-        } else {
-            "<bos><start_of_turn>user\n$userMessage<end_of_turn>\n<start_of_turn>model\n"
-        }
+        return "<bos><start_of_turn>user\n$userMessage<end_of_turn>\n<start_of_turn>model\n"
     }
     
     private fun extractMessageContent(userMessage: String): String {
-        val patterns = listOf(
-            """(?:alert|show|display|popup)\s+(?:with\s+)?(?:message\s+)?["']?([^"']+)["']?$""".toRegex(RegexOption.IGNORE_CASE),
-            """(?:saying|with)\s+["']?([^"']+)["']?$""".toRegex(RegexOption.IGNORE_CASE),
-            """(?:message\s+)?["']?([^"']+)["']?$""".toRegex(RegexOption.IGNORE_CASE)
-        )
+        val lower = userMessage.lowercase()
+        val keywords = listOf("alert", "show", "display", "popup", "with", "saying", "message")
         
-        for (pattern in patterns) {
-            val match = pattern.find(userMessage)
-            if (match != null) {
-                return match.groupValues[1].trim().trimQuotes()
+        var msg = userMessage
+        for (keyword in keywords) {
+            val idx = lower.indexOf(keyword)
+            if (idx >= 0) {
+                msg = userMessage.substring(idx + keyword.length).trim()
+                break
             }
         }
         
-        return userMessage.trim()
+        return msg.trim('"', '\'')
     }
     
-    private fun String.trimQuotes(): String = trim('"', '\'')
-    
     private fun parseFunctionGemmaResponse(response: String): LLMResponse {
-        android.util.Log.d("FunctionGemma", "Parsing response: $response")
-        
         val funcRegex = """\{\s*"call"\s*:\s*"(\w+)"\s*,\s*"msg"\s*:\s*"([^"]*)"\s*\}""".toRegex()
         val match = funcRegex.find(response)
         
         if (match != null) {
             val functionName = match.groupValues[1]
             val msg = match.groupValues[2]
-            android.util.Log.d("FunctionGemma", "Found function call: $functionName with msg: $msg")
             return LLMResponse.FunctionCall(
                 FunctionCallResult(functionName, mapOf("message" to msg))
             )
         }
-        
-        android.util.Log.d("FunctionGemma", "No function call found, returning as text")
         
         val text = response
             .replace("<start_of_turn>", "")
