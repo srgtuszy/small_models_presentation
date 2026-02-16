@@ -40,8 +40,7 @@
         /* Key content elements grow to fill vertical space */
         .reveal .slides section .cols,
         .reveal .slides section .card,
-        .reveal .slides section .demo-box,
-        .reveal .slides section pre {
+        .reveal .slides section .demo-box {
             flex-grow: 1;
             flex-shrink: 1;
         }
@@ -168,13 +167,15 @@
         .reveal pre {
             width: 100%;
             margin: 0.3em 0;
-            flex-grow: 1;
+            flex-shrink: 1;
+            min-height: 0;
+            overflow: hidden;
         }
 
         .reveal pre code {
             padding: 0.7em 0.9em;
-            font-size: 1.4em;
-            line-height: 1.5;
+            font-size: 1.15em;
+            line-height: 1.35;
             max-height: none;
             border-radius: 8px;
         }
@@ -199,7 +200,7 @@
         }
 
         .reveal .card pre code {
-            font-size: 1.2em;
+            font-size: 0.95em;
         }
 
         .reveal .big {
@@ -289,6 +290,7 @@
             border-left: 4px solid #42affa;
             padding-left: 0.7em;
             margin: 0.4em 0;
+            margin-top: auto;
             font-size: 1em;
         }
 
