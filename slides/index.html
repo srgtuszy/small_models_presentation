@@ -1,128 +1,162 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8">
     <title>Small Models Running in Your App</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/reveal.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/theme/black.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/plugin/highlight/monokai.css">
-    
+
     <style>
         .reveal-viewport {
             background: #191919;
         }
-        
+
         .reveal .slides section {
             height: 100%;
             top: 0 !important;
         }
-        
-        .reveal .slides section > * {
+
+        .reveal .slides section>* {
             margin: 0.2em 0;
         }
-        
-        .reveal h1, .reveal h2, .reveal h3, .reveal h4 {
+
+        .reveal h1,
+        .reveal h2,
+        .reveal h3,
+        .reveal h4 {
             text-transform: none;
             letter-spacing: -0.02em;
             font-weight: 700;
             margin: 0.15em 0;
         }
-        
-        .reveal h1 { font-size: 1.6em; }
-        .reveal h2 { font-size: 1.2em; margin-bottom: 0.3em; }
-        .reveal h3 { font-size: 0.95em; }
-        .reveal h4 { font-size: 0.8em; margin-bottom: 0.1em; }
-        
+
+        .reveal h1 {
+            font-size: 1.6em;
+        }
+
+        .reveal h2 {
+            font-size: 1.2em;
+            margin-bottom: 0.3em;
+        }
+
+        .reveal h3 {
+            font-size: 0.95em;
+        }
+
+        .reveal h4 {
+            font-size: 0.8em;
+            margin-bottom: 0.1em;
+        }
+
         .reveal section {
             text-align: left;
         }
-        
+
         .reveal section.center {
             text-align: center;
         }
-        
+
         .reveal p {
             margin: 0.2em 0;
             font-size: 0.75em;
         }
-        
+
         .reveal .lead {
             font-size: 0.9em;
             margin: 0.3em 0;
         }
-        
+
         .reveal .sub {
             color: #888;
             font-size: 0.65em;
         }
-        
+
         .reveal table {
             margin: 0.2em 0;
             font-size: 0.5em;
         }
-        
+
         .reveal table th {
             background: rgba(66, 175, 250, 0.25);
             text-transform: none;
         }
-        
-        .reveal table td, .reveal table th {
+
+        .reveal table td,
+        .reveal table th {
             padding: 0.25em 0.5em;
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        
-        .reveal .hl { color: #42affa; font-weight: bold; }
-        .reveal .accent { color: #f0a868; }
-        .reveal .green { color: #8be9c0; }
-        .reveal .dim { color: #666; font-size: 0.85em; }
-        .reveal .warn { color: #ff6b6b; }
-        
+
+        .reveal .hl {
+            color: #42affa;
+            font-weight: bold;
+        }
+
+        .reveal .accent {
+            color: #f0a868;
+        }
+
+        .reveal .green {
+            color: #8be9c0;
+        }
+
+        .reveal .dim {
+            color: #666;
+            font-size: 0.85em;
+        }
+
+        .reveal .warn {
+            color: #ff6b6b;
+        }
+
         .reveal code:not([class]) {
-            background: rgba(0,0,0,0.4);
+            background: rgba(0, 0, 0, 0.4);
             padding: 0.1em 0.3em;
             border-radius: 3px;
             font-size: 0.75em;
         }
-        
+
         .reveal pre {
             width: 100%;
             margin: 0.2em 0;
         }
-        
+
         .reveal pre code {
             padding: 0.5em;
             font-size: 0.4em;
             line-height: 1.3;
         }
-        
+
         .reveal .cols {
             display: flex;
             gap: 0.8em;
             align-items: flex-start;
         }
-        
-        .reveal .cols > * {
+
+        .reveal .cols>* {
             flex: 1;
         }
-        
+
         .reveal .card {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 6px;
             padding: 0.4em;
             margin: 0.2em 0;
             font-size: 0.7em;
         }
-        
+
         .reveal .big {
             font-size: 1.8em;
             font-weight: 700;
             color: #42affa;
             line-height: 1;
         }
-        
+
         .reveal .flow {
             display: flex;
             align-items: center;
@@ -130,7 +164,7 @@
             font-size: 0.5em;
             flex-wrap: wrap;
         }
-        
+
         .reveal .flow .box {
             background: rgba(66, 175, 250, 0.2);
             border: 1px solid rgba(66, 175, 250, 0.4);
@@ -138,11 +172,11 @@
             padding: 0.25em 0.4em;
             white-space: nowrap;
         }
-        
+
         .reveal .flow .arrow {
             color: #42affa;
         }
-        
+
         .reveal .demo-box {
             background: linear-gradient(135deg, rgba(66, 175, 250, 0.15), rgba(240, 168, 104, 0.15));
             border-radius: 8px;
@@ -150,37 +184,37 @@
             text-align: center;
             margin: 0.3em 0;
         }
-        
+
         .reveal ul {
             list-style: none;
             padding: 0;
             margin: 0;
             font-size: 0.65em;
         }
-        
+
         .reveal ul li {
             position: relative;
             padding-left: 1em;
             margin: 0.15em 0;
         }
-        
+
         .reveal ul li::before {
             content: "▸";
             position: absolute;
             left: 0;
             color: #42affa;
         }
-        
+
         .reveal ol {
             margin: 0;
             padding-left: 1.2em;
             font-size: 0.65em;
         }
-        
+
         .reveal ol li {
             margin: 0.15em 0;
         }
-        
+
         .reveal .speaker-hint {
             position: absolute;
             bottom: 0.5em;
@@ -189,7 +223,7 @@
             color: #444;
             font-style: italic;
         }
-        
+
         .reveal .example {
             background: rgba(139, 233, 192, 0.1);
             border-left: 3px solid #8be9c0;
@@ -197,14 +231,14 @@
             margin: 0.3em 0;
             font-size: 0.6em;
         }
-        
+
         .reveal .key-point {
             border-left: 3px solid #42affa;
             padding-left: 0.5em;
             margin: 0.3em 0;
             font-size: 0.7em;
         }
-        
+
         .reveal .badge {
             display: inline-block;
             background: rgba(66, 175, 250, 0.3);
@@ -213,23 +247,47 @@
             font-size: 0.6em;
             margin-right: 0.3em;
         }
-        
-        .reveal .badge.green { background: rgba(139, 233, 192, 0.3); }
-        .reveal .badge.orange { background: rgba(240, 168, 104, 0.3); }
+
+        .reveal .badge.green {
+            background: rgba(139, 233, 192, 0.3);
+        }
+
+        .reveal .badge.orange {
+            background: rgba(240, 168, 104, 0.3);
+        }
     </style>
 </head>
+
 <body>
     <div class="reveal">
         <div class="slides">
 
             <!-- ===== SECTION: INTRO ===== -->
-            
+
             <!-- Title -->
             <section class="center">
                 <h1>Small Models Running in Your App</h1>
-                <p class="dim">Mobile Warsaw</p>
+                <p class="dim">Michał Tuszyński</p>
+                <p class="dim" style="font-size: 0.55em; margin-top: 0.3em;">
+                    <a href="https://github.com/srgtuszy" target="_blank"
+                        style="color: #888; text-decoration: none; margin-right: 1em;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            viewBox="0 0 16 16" style="vertical-align: middle; margin-right: 0.3em;">
+                            <path
+                                d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.54 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z" />
+                        </svg>
+                        srgtuszy
+                    </a>
+                    <a href="https://x.com/srgtuszy" target="_blank" style="color: #888; text-decoration: none;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor"
+                            viewBox="0 0 24 24" style="vertical-align: middle; margin-right: 0.3em;">
+                            <path
+                                d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                        </svg>
+                        srgtuszy
+                    </a>
+                </p>
                 <p style="margin-top: 1em;"><span class="hl">On-device AI without the cloud</span></p>
-                <p class="sub">Press <kbd>S</kbd> for speaker notes</p>
                 <aside class="notes">
                     <p><strong>Welcome everyone!</strong></p>
                     <p>Today I'll show you how to run AI models directly on mobile devices.</p>
@@ -299,10 +357,10 @@
                     <div class="card">
                         <h4>Example Scenario</h4>
                         <p class="example">User: "Set reminder for 5pm"<br>
-                        → Data sent to OpenAI/Google<br>
-                        → Server processes<br>
-                        → Response returns<br>
-                        → Total: ~1 second, ~$0.001</p>
+                            → Data sent to OpenAI/Google<br>
+                            → Server processes<br>
+                            → Response returns<br>
+                            → Total: ~1 second, ~$0.001</p>
                     </div>
                 </div>
                 <aside class="notes">
@@ -322,12 +380,36 @@
                 </div>
                 <p class="lead">Think about what your app actually does:</p>
                 <table>
-                    <tr><th>Your App Needs</th><th>Cloud Model?</th><th>On-Device Works?</th></tr>
-                    <tr><td>Parse user commands</td><td class="dim">Overkill</td><td class="green">✓ 100MB</td></tr>
-                    <tr><td>Classify text</td><td class="dim">Overkill</td><td class="green">✓ 10MB</td></tr>
-                    <tr><td>Search similar content</td><td class="dim">Overkill</td><td class="green">✓ 50MB</td></tr>
-                    <tr><td>Generate descriptions</td><td class="dim">Optional</td><td class="green">✓ 300MB</td></tr>
-                    <tr><td>Complex research</td><td class="accent">Yes</td><td class="dim">No</td></tr>
+                    <tr>
+                        <th>Your App Needs</th>
+                        <th>Cloud Model?</th>
+                        <th>On-Device Works?</th>
+                    </tr>
+                    <tr>
+                        <td>Parse user commands</td>
+                        <td class="dim">Overkill</td>
+                        <td class="green">✓ 100MB</td>
+                    </tr>
+                    <tr>
+                        <td>Classify text</td>
+                        <td class="dim">Overkill</td>
+                        <td class="green">✓ 10MB</td>
+                    </tr>
+                    <tr>
+                        <td>Search similar content</td>
+                        <td class="dim">Overkill</td>
+                        <td class="green">✓ 50MB</td>
+                    </tr>
+                    <tr>
+                        <td>Generate descriptions</td>
+                        <td class="dim">Optional</td>
+                        <td class="green">✓ 300MB</td>
+                    </tr>
+                    <tr>
+                        <td>Complex research</td>
+                        <td class="accent">Yes</td>
+                        <td class="dim">No</td>
+                    </tr>
                 </table>
                 <aside class="notes">
                     <p>Ask yourself: Does my app need to write poetry? Analyze scientific papers?</p>
@@ -624,7 +706,8 @@
                     </div>
                 </div>
                 <div class="key-point">
-                    <p>Model maps <span class="hl">natural language</span> → <span class="green">structured output</span></p>
+                    <p>Model maps <span class="hl">natural language</span> → <span class="green">structured
+                            output</span></p>
                 </div>
                 <aside class="notes">
                     <p>1. Your app tells the model what functions exist.</p>
@@ -638,10 +721,30 @@
             <section>
                 <h2>Models for Function Calling</h2>
                 <table>
-                    <tr><th>Model</th><th>Size</th><th>Accuracy</th><th>Best For</th></tr>
-                    <tr><td>Tiny Transformer</td><td class="green">20K params</td><td class="dim">70%</td><td>Learning/Demo</td></tr>
-                    <tr><td>FunctionGemma</td><td class="green">270M</td><td class="accent">85%</td><td>Production Apps</td></tr>
-                    <tr><td>GPT-4o-mini</td><td class="dim">Cloud</td><td class="green">95%</td><td>Complex reasoning</td></tr>
+                    <tr>
+                        <th>Model</th>
+                        <th>Size</th>
+                        <th>Accuracy</th>
+                        <th>Best For</th>
+                    </tr>
+                    <tr>
+                        <td>Tiny Transformer</td>
+                        <td class="green">20K params</td>
+                        <td class="dim">70%</td>
+                        <td>Learning/Demo</td>
+                    </tr>
+                    <tr>
+                        <td>FunctionGemma</td>
+                        <td class="green">270M</td>
+                        <td class="accent">85%</td>
+                        <td>Production Apps</td>
+                    </tr>
+                    <tr>
+                        <td>GPT-4o-mini</td>
+                        <td class="dim">Cloud</td>
+                        <td class="green">95%</td>
+                        <td>Complex reasoning</td>
+                    </tr>
                 </table>
                 <div class="cols">
                     <div class="card">
@@ -806,9 +909,9 @@
                 </aside>
             </section>
 
-<!-- ===== SECTION: FINE-TUNING ===== -->
+            <!-- ===== SECTION: FINE-TUNING ===== -->
 
-<!-- Fine-Tuning Intro -->
+            <!-- Fine-Tuning Intro -->
             <section>
                 <h2>Fine-Tuning FunctionGemma</h2>
                 <p class="lead">Customize for <span class="hl">your specific tools</span></p>
@@ -864,7 +967,8 @@
                     </div>
                 </div>
                 <div class="key-point">
-                    <p><span class="badge orange">Note</span> Unsloth requires NVIDIA GPU. Mac users: use Google Colab (free T4 GPU)</p>
+                    <p><span class="badge orange">Note</span> Unsloth requires NVIDIA GPU. Mac users: use Google Colab
+                        (free T4 GPU)</p>
                 </div>
                 <aside class="notes">
                     <p>Unsloth is the fastest way to fine-tune LLMs.</p>
@@ -975,7 +1079,8 @@ model.save_pretrained_gguf("model", tokenizer)</code></pre>
                         <h4 class="green">After Fine-Tuning</h4>
                         <div class="example" style="background: rgba(139,233,192,0.1);">
                             <p><strong>User:</strong> "Show alert hello"</p>
-                            <p><strong>Model:</strong> <span class="green">{"call":"show_alert","msg":"hello"}</span></p>
+                            <p><strong>Model:</strong> <span class="green">{"call":"show_alert","msg":"hello"}</span>
+                            </p>
                         </div>
                         <p class="green">Correct function call!</p>
                     </div>
@@ -991,17 +1096,37 @@ model.save_pretrained_gguf("model", tokenizer)</code></pre>
                 </aside>
             </section>
 
-<!-- ===== SECTION: DEPLOYMENT ===== -->
+            <!-- ===== SECTION: DEPLOYMENT ===== -->
 
-<!-- Mobile Requirements -->
+            <!-- Mobile Requirements -->
             <section>
                 <h2>Running on Mobile</h2>
                 <table>
-                    <tr><th>Model Size</th><th>RAM Needed</th><th>Works On</th></tr>
-                    <tr><td>10MB</td><td>100MB</td><td class="green">All phones</td></tr>
-                    <tr><td>100MB</td><td>500MB</td><td class="green">Mid-range+</td></tr>
-                    <tr><td>300MB</td><td>1GB</td><td class="accent">Flagships</td></tr>
-                    <tr><td>1GB+</td><td>2GB+</td><td class="dim">High-end only</td></tr>
+                    <tr>
+                        <th>Model Size</th>
+                        <th>RAM Needed</th>
+                        <th>Works On</th>
+                    </tr>
+                    <tr>
+                        <td>10MB</td>
+                        <td>100MB</td>
+                        <td class="green">All phones</td>
+                    </tr>
+                    <tr>
+                        <td>100MB</td>
+                        <td>500MB</td>
+                        <td class="green">Mid-range+</td>
+                    </tr>
+                    <tr>
+                        <td>300MB</td>
+                        <td>1GB</td>
+                        <td class="accent">Flagships</td>
+                    </tr>
+                    <tr>
+                        <td>1GB+</td>
+                        <td>2GB+</td>
+                        <td class="dim">High-end only</td>
+                    </tr>
                 </table>
                 <div class="cols">
                     <div class="card">
@@ -1068,13 +1193,41 @@ model.save_pretrained_gguf("model", tokenizer)</code></pre>
             <section>
                 <h2>Cloud vs On-Device</h2>
                 <table>
-                    <tr><th>Factor</th><th>On-Device</th><th>Cloud API</th></tr>
-                    <tr><td>Latency</td><td class="green">~300ms</td><td class="dim">500ms-2s</td></tr>
-                    <tr><td>Privacy</td><td class="green">100% local</td><td class="dim">Sent to server</td></tr>
-                    <tr><td>Offline</td><td class="green">✓ Works</td><td class="dim">✗ No</td></tr>
-                    <tr><td>Cost</td><td class="green">Free</td><td class="dim">$0.001-0.01/request</td></tr>
-                    <tr><td>Quality</td><td class="accent">Good (85%)</td><td class="dim">Best (95%)</td></tr>
-                    <tr><td>Model Size</td><td class="accent">Limited</td><td class="dim">Unlimited</td></tr>
+                    <tr>
+                        <th>Factor</th>
+                        <th>On-Device</th>
+                        <th>Cloud API</th>
+                    </tr>
+                    <tr>
+                        <td>Latency</td>
+                        <td class="green">~300ms</td>
+                        <td class="dim">500ms-2s</td>
+                    </tr>
+                    <tr>
+                        <td>Privacy</td>
+                        <td class="green">100% local</td>
+                        <td class="dim">Sent to server</td>
+                    </tr>
+                    <tr>
+                        <td>Offline</td>
+                        <td class="green">✓ Works</td>
+                        <td class="dim">✗ No</td>
+                    </tr>
+                    <tr>
+                        <td>Cost</td>
+                        <td class="green">Free</td>
+                        <td class="dim">$0.001-0.01/request</td>
+                    </tr>
+                    <tr>
+                        <td>Quality</td>
+                        <td class="accent">Good (85%)</td>
+                        <td class="dim">Best (95%)</td>
+                    </tr>
+                    <tr>
+                        <td>Model Size</td>
+                        <td class="accent">Limited</td>
+                        <td class="dim">Unlimited</td>
+                    </tr>
                 </table>
                 <aside class="notes">
                     <p>Let's compare the trade-offs honestly.</p>
@@ -1095,7 +1248,7 @@ model.save_pretrained_gguf("model", tokenizer)</code></pre>
                         <li>Privacy is important (health, finance apps)</li>
                         <li>Offline support matters</li>
                         <li>Cost sensitivity (many requests)</li>
-                        <li>Low latency required (<500ms)</li>
+                        <li>Low latency required (<500ms)< /li>
                     </ul>
                 </div>
                 <div class="card">
@@ -1220,7 +1373,7 @@ model.save_pretrained_gguf("model", tokenizer)</code></pre>
 
         </div>
     </div>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/dist/reveal.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/plugin/highlight/highlight.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.6.1/plugin/notes/notes.js"></script>
@@ -1230,8 +1383,9 @@ model.save_pretrained_gguf("model", tokenizer)</code></pre>
             slideNumber: 'c/t',
             transition: 'slide',
             embedded: false,
-            plugins: [ RevealHighlight, RevealNotes ]
+            plugins: [RevealHighlight, RevealNotes]
         });
     </script>
 </body>
+
 </html>

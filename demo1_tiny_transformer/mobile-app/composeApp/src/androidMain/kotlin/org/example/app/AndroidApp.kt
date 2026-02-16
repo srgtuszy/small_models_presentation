@@ -24,10 +24,11 @@ fun AndroidApp(context: Context) {
     
     LaunchedEffect(Unit) {
         try {
-            val vocabJson = context.assets.open("vocab.json").bufferedReader().use { it.readText() }
-            val weightsJson = context.assets.open("weights.json").bufferedReader().use { it.readText() }
-            
-            val (_, cmdParser) = ModelLoader.loadFromAssets(vocabJson, weightsJson)
+            val (_, cmdParser) = withContext(Dispatchers.IO) {
+                val vocabJson = context.assets.open("vocab.json").bufferedReader().use { it.readText() }
+                val weightsJson = context.assets.open("weights.json").bufferedReader().use { it.readText() }
+                ModelLoader.loadFromAssets(vocabJson, weightsJson)
+            }
             parser = cmdParser
         } catch (e: Exception) {
             error = "Failed to load model: ${e.message}"
