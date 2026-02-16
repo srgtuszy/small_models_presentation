@@ -34,6 +34,22 @@ data class ChatMessage(
     val isError: Boolean = false
 )
 
+fun extractAlertMessage(input: String): String {
+    val lower = input.lowercase()
+    val keywords = listOf("alert", "show", "display", "popup", "with", "saying", "message")
+    
+    var msg = input
+    for (keyword in keywords) {
+        val idx = lower.indexOf(keyword)
+        if (idx >= 0) {
+            msg = input.substring(idx + keyword.length).trim()
+            break
+        }
+    }
+    
+    return msg.trim('"', '\'').ifEmpty { "Hello" }
+}
+
 @Composable
 fun App() {
     MaterialTheme {
@@ -139,7 +155,8 @@ fun App() {
                                     isUser = false
                                 )
                                 is LLMResponse.FunctionCall -> {
-                                    val message = response.result.arguments["message"] ?: "No message"
+                                    val message = response.result.arguments["message"]?.takeIf { it.isNotBlank() }
+                                        ?: extractAlertMessage(messageText)
                                     dialogMessage = message
                                     showDialog = true
                                     ChatMessage(
@@ -159,11 +176,11 @@ fun App() {
                                     isUser = false,
                                     isError = true
                                 )
-}
+                            }
                             messages = messages + responseMessage
-                         }
-                     }
-                 },
+                        }
+                    }
+                },
                 isLoading = isLoading
             )
         }

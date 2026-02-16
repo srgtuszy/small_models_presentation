@@ -157,29 +157,48 @@ class AndroidLLMEngine(private val context: Context) : LLMEngine {
     }
     
     private fun parseFunctionGemmaResponse(response: String): LLMResponse {
-        val funcCallRegex = """<start_function_call>call:(\w+)\{([^}]*)\}<end_function_call>""".toRegex()
-        val match = funcCallRegex.find(response)
+        if (response.isBlank()) {
+            return LLMResponse.Text("")
+        }
         
-        if (match != null) {
-            val functionName = match.groupValues[1]
-            val paramsStr = match.groupValues[2]
-            val params = mutableMapOf<String, String>()
-            
-            val paramRegex = """(\w+):<escape>([^<]*)<escape>""".toRegex()
-            paramRegex.findAll(paramsStr).forEach { paramMatch ->
-                params[paramMatch.groupValues[1]] = paramMatch.groupValues[2]
+        // Try multiple formats the model might output
+        val patterns = listOf(
+            """call:(\w+)\{([^}]*)\}""",
+            """<start_function_call>call:(\w+)\{([^}]*)\}<end_function_call>""",
+            """(\w+)\s*\(\s*([^)]*)\s*\)"""
+        )
+        
+        for (pattern in patterns) {
+            val match = pattern.toRegex().find(response)
+            if (match != null) {
+                val functionName = match.groupValues[1]
+                val paramsStr = match.groupValues.getOrNull(2) ?: ""
+                val params = mutableMapOf<String, String>()
+                
+                // Parse parameters in different formats
+                val paramPatterns = listOf(
+                    """(\w+):<escape>([^<]*)<escape>""",
+                    """(\w+):‹([^›]*)›""",
+                    """(\w+):["']([^"']*)["']""",
+                    """"(\w+)"\s*:\s*"([^"]*)""""
+                )
+                
+                for (paramPattern in paramPatterns) {
+                    paramPattern.toRegex().findAll(paramsStr).forEach { paramMatch ->
+                        params[paramMatch.groupValues[1]] = paramMatch.groupValues[2]
+                    }
+                    if (params.isNotEmpty()) break
+                }
+                
+                if (functionName.isNotBlank()) {
+                    return LLMResponse.FunctionCall(FunctionCallResult(functionName, params))
+                }
             }
-            
-            return LLMResponse.FunctionCall(FunctionCallResult(functionName, params))
         }
         
         val text = response
-            .replace("<start_of_turn>", "")
-            .replace("<end_of_turn>", "")
-            .replace("<bos>", "")
-            .replace("<start_function_call>", "")
-            .replace("<end_function_call>", "")
-            .replace("<escape>", "")
+            .replace(Regex("<[^>]+>"), "")
+            .replace(Regex("‹[^›]*›"), "")
             .trim()
         
         return LLMResponse.Text(text)

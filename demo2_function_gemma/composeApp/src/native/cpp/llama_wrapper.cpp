@@ -106,16 +106,17 @@ LlamaContext llama_create_context(const char* model_path, int n_ctx, int n_gpu_l
     internal->sampler = llama_sampler_chain_init(sampler_params);
     
     // Add sampling stages (applied in order):
-    llama_sampler_chain_add(internal->sampler, llama_sampler_init_temp(1.0f));     // Temperature
-    llama_sampler_chain_add(internal->sampler, llama_sampler_init_top_k(64));       // Top-K sampling
-    llama_sampler_chain_add(internal->sampler, llama_sampler_init_top_p(0.95f, 1)); // Top-P (nucleus) sampling
+    llama_sampler_chain_add(internal->sampler, llama_sampler_init_penalties(-1, 1.3f, 0.1f, 0.0f)); // Repetition penalty (stronger)
+    llama_sampler_chain_add(internal->sampler, llama_sampler_init_temp(0.9f));     // Temperature (slightly lower)
+    llama_sampler_chain_add(internal->sampler, llama_sampler_init_top_k(40));       // Top-K sampling (lower for more focused)
+    llama_sampler_chain_add(internal->sampler, llama_sampler_init_top_p(0.9f, 1)); // Top-P (nucleus) sampling
     llama_sampler_chain_add(internal->sampler, llama_sampler_init_dist(0));         // Random selection
     
     // SAMPLING EXPLAINED:
-    // - Temperature: Controls randomness. Higher = more creative, lower = more deterministic
-    //   - 1.0 = normal, 0.1 = very focused, 2.0 = very random
-    // - Top-K: Only consider the K most likely tokens (64 here)
-    // - Top-P: Keep tokens until cumulative probability reaches P (0.95 = 95%)
+    // - Penalties: Penalize repeated tokens (1.3 = 30% penalty, 0.1 freq penalty)
+    // - Temperature: Controls randomness. 0.9 = slightly focused
+    // - Top-K: Only consider the K most likely tokens (40 here)
+    // - Top-P: Keep tokens until cumulative probability reaches P (0.9 = 90%)
     // - Dist: Randomly select from the filtered distribution
     
     internal->loaded = true;
