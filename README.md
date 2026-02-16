@@ -234,9 +234,31 @@ code --install-extension redhat.java
 
 ---
 
-## 📄 License
+## 📄 Credits & License
 
-Demo code is provided as-is for educational purposes. FunctionGemma is subject to [Google's Gemma Terms of Use](https://ai.google.dev/gemma/terms).
+### FunctionGemma / Gemma
+
+This project uses **[FunctionGemma](https://huggingface.co/google/functiongemma-270m-it)**, a function-calling model built on **Gemma 3 270M** by **Google**.
+
+> **Gemma is provided under and subject to the Gemma Terms of Use found at [ai.google.dev/gemma/terms](https://ai.google.dev/gemma/terms)**
+
+FunctionGemma is a lightweight, open model designed to be fine-tuned for specific function-calling tasks. It is subject to Google's [Gemma Terms of Use](https://ai.google.dev/gemma/terms) and [Prohibited Use Policy](https://ai.google.dev/gemma/prohibited_use_policy). By using or distributing this project, you agree to those terms.
+
+The GGUF quantization used in this project is provided by [bartowski](https://huggingface.co/bartowski/google_functiongemma-270m-it-GGUF).
+
+### Other Credits
+
+| Component | Author | License |
+|---|---|---|
+| [llama.cpp](https://github.com/ggerganov/llama.cpp) | Georgi Gerganov | MIT |
+| [Llamatik](https://github.com/ferranpons/Llamatik) | Ferran Pons | Apache 2.0 |
+| [Reveal.js](https://github.com/hakimel/reveal.js) | Hakim El Hattab | MIT |
+| [Unsloth](https://github.com/unslothai/unsloth) | Unsloth AI | Apache 2.0 |
+| [NanoGPT](https://github.com/karpathy/nanoGPT) | Andrej Karpathy | MIT |
+
+### Demo Code
+
+The demo code in this repository is provided as-is for **educational purposes**. See the [`NOTICE`](./NOTICE) file for required legal notices.
 
 ---
 
