@@ -35,28 +35,28 @@ class iOSLLMEngine : LLMEngine {
         
         return when {
             lowerMessage.contains("reminder") -> {
-                "<start_function_call>call:set_reminder{title:<escape>Buy milk<escape>,time:<escape>tomorrow at 5pm<escape>}<end_function_call>"
+                "{\"name\": \"set_reminder\", \"arguments\": {\"title\": \"Buy milk\", \"time\": \"tomorrow at 5pm\"}}"
             }
             lowerMessage.contains("navigate") || lowerMessage.contains("settings") -> {
-                "<start_function_call>call:navigate_to_screen{screen:<escape>settings<escape>}<end_function_call>"
+                "{\"name\": \"navigate_to_screen\", \"arguments\": {\"screen\": \"settings\"}}"
             }
             lowerMessage.contains("dark mode") || lowerMessage.contains("toggle") -> {
-                "<start_function_call>call:toggle_setting{setting:<escape>dark_mode<escape>,enabled:<escape>true<escape>}<end_function_call>"
+                "{\"name\": \"toggle_setting\", \"arguments\": {\"setting\": \"dark_mode\", \"enabled\": \"true\"}}"
             }
             lowerMessage.contains("weather") -> {
-                "<start_function_call>call:get_weather{location:<escape>Warsaw<escape>}<end_function_call>"
+                "{\"name\": \"get_weather\", \"arguments\": {\"location\": \"Warsaw\"}}"
             }
             lowerMessage.contains("message") || lowerMessage.contains("send") -> {
-                "<start_function_call>call:send_message{contact:<escape>John<escape>,message:<escape>Hello!<escape>}<end_function_call>"
+                "{\"name\": \"send_message\", \"arguments\": {\"contact\": \"John\", \"message\": \"Hello!\"}}"
             }
             lowerMessage.contains("music") || lowerMessage.contains("play") -> {
-                "<start_function_call>call:play_music{song:<escape>Coldplay<escape>,artist:<escape>Unknown<escape>}<end_function_call>"
+                "{\"name\": \"play_music\", \"arguments\": {\"song\": \"Coldplay\", \"artist\": \"Unknown\"}}"
             }
             lowerMessage.contains("timer") -> {
-                "<start_function_call>call:set_timer{duration:<escape>10 minutes<escape>}<end_function_call>"
+                "{\"name\": \"set_timer\", \"arguments\": {\"duration\": \"10 minutes\"}}"
             }
             lowerMessage.contains("call") -> {
-                "<start_function_call>call:make_call{contact:<escape>Mom<escape>}<end_function_call>"
+                "{\"name\": \"make_call\", \"arguments\": {\"contact\": \"Mom\"}}"
             }
             else -> "I understand you want to: $userMessage. Please describe which function you'd like to call."
         }

@@ -17,7 +17,11 @@ import org.example.model.Command
 import org.example.model.CommandParser
 
 @Composable
-fun App(parser: CommandParser? = null) {
+fun App(
+    parser: CommandParser? = null,
+    parsing: Boolean = false,
+    onParse: (String, (Command?) -> Unit) -> Unit = { _, _ -> }
+) {
     var inputText by remember { mutableStateOf("") }
     var outputText by remember { mutableStateOf("") }
     var lastCommand by remember { mutableStateOf<Command?>(null) }
@@ -64,28 +68,38 @@ fun App(parser: CommandParser? = null) {
                 Button(
                     onClick = {
                         if (inputText.isNotBlank() && parser != null) {
-                            val command = parser.parse(inputText)
-                            val jsonOutput = command?.let { 
-                                when {
-                                    it.message != null -> """{"action": "${it.action}", "message": "${it.message}"}"""
-                                    it.target != null -> """{"action": "${it.action}", "target": "${it.target}"}"""
-                                    it.setting != null -> """{"action": "${it.action}", "setting": "${it.setting}"}"""
-                                    else -> """{"action": "${it.action}"}"""
+                            onParse(inputText) { command ->
+                                val jsonOutput = command?.let { 
+                                    when {
+                                        it.message != null -> """{"action": "${it.action}", "message": "${it.message}"}"""
+                                        it.target != null -> """{"action": "${it.action}", "target": "${it.target}"}"""
+                                        it.setting != null -> """{"action": "${it.action}", "setting": "${it.setting}"}"""
+                                        else -> """{"action": "${it.action}"}"""
+                                    }
+                                } ?: "Failed to parse command"
+                                
+                                outputText = jsonOutput
+                                lastCommand = command
+                                history.add(0, "Input: $inputText\nOutput: $jsonOutput")
+                                
+                                if (command?.action == "alert" && command.message != null) {
+                                    showDialog = true
                                 }
-                            } ?: "Failed to parse command"
-                            
-                            outputText = jsonOutput
-                            lastCommand = command
-                            history.add(0, "Input: $inputText\nOutput: $jsonOutput")
-                            
-                            if (command?.action == "alert" && command.message != null) {
-                                showDialog = true
                             }
                         }
                     },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    enabled = !parsing
                 ) {
-                    Text("Parse Command")
+                    if (parsing) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            strokeWidth = 2.dp,
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
+                    } else {
+                        Text("Parse Command")
+                    }
                 }
                 
                 OutlinedButton(
@@ -258,12 +272,24 @@ fun ExampleCommandsSection(onClick: (String) -> Unit) {
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 row.forEach { example ->
-                    FilterChip(
-                        selected = false,
-                        onClick = { onClick(example) },
-                        label = { Text(example, fontSize = 12.sp) },
-                        modifier = Modifier.padding(vertical = 2.dp)
-                    )
+                    Box(modifier = Modifier.weight(1f)) {
+                        FilterChip(
+                            selected = false,
+                            onClick = { onClick(example) },
+                            label = { 
+                                Text(
+                                    example, 
+                                    fontSize = 12.sp,
+                                    maxLines = 1,
+                                    softWrap = false
+                                ) 
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
+                repeat(3 - row.size) {
+                    Spacer(modifier = Modifier.weight(1f))
                 }
             }
         }

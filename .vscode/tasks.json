@@ -12,6 +12,99 @@
             "presentation": { "reveal": "always", "panel": "new", "clear": true }
         },
         {
+            "label": "▶ Demo 1: Android Build",
+            "type": "shell",
+            "command": "./gradlew",
+            "args": [":composeApp:assembleDebug"],
+            "options": { "cwd": "${workspaceFolder}/demo1_tiny_transformer/mobile-app" },
+            "group": "build",
+            "detail": "Build Android APK",
+            "presentation": { "reveal": "always", "clear": true }
+        },
+        {
+            "label": "▶ Demo 1: Android Install",
+            "type": "shell",
+            "command": "./gradlew",
+            "args": [":composeApp:installDebug"],
+            "options": { "cwd": "${workspaceFolder}/demo1_tiny_transformer/mobile-app" },
+            "group": "build",
+            "detail": "Install on connected Android device",
+            "presentation": { "reveal": "always", "clear": true }
+        },
+        {
+            "label": "▶ Demo 1: Android (Full)",
+            "dependsOn": ["▶ Demo 1: Android Build", "▶ Demo 1: Android Install"],
+            "dependsOrder": "sequence",
+            "group": { "kind": "build", "isDefault": false },
+            "detail": "Build and install app on connected device",
+            "problemMatcher": []
+        },
+        {
+            "label": "▶ Demo 1: iOS Generate Project",
+            "type": "shell",
+            "command": "xcodegen",
+            "args": ["generate"],
+            "options": { "cwd": "${workspaceFolder}/demo1_tiny_transformer/mobile-app/iosApp" },
+            "group": "build",
+            "detail": "Generate Xcode project from project.yml",
+            "presentation": { "reveal": "silent" }
+        },
+        {
+            "label": "▶ Demo 1: iOS Build Framework",
+            "type": "shell",
+            "command": "./gradlew",
+            "args": [":composeApp:linkDebugFrameworkIosSimulatorArm64"],
+            "options": { "cwd": "${workspaceFolder}/demo1_tiny_transformer/mobile-app" },
+            "group": "build",
+            "detail": "Build Shared.framework for simulator only (fast)",
+            "presentation": { "reveal": "always", "clear": true }
+        },
+        {
+            "label": "▶ Demo 1: iOS Build App",
+            "type": "shell",
+            "command": "xcodebuild",
+            "args": [
+                "-project", "iosApp.xcodeproj",
+                "-scheme", "iosApp",
+                "-destination", "platform=iOS Simulator,id=24BF1FED-6B05-479D-88B1-3E48AB3291B7",
+                "-configuration", "Debug",
+                "SYMROOT=build",
+                "build"
+            ],
+            "options": { "cwd": "${workspaceFolder}/demo1_tiny_transformer/mobile-app/iosApp" },
+            "group": "build",
+            "detail": "Build iOS app for simulator",
+            "presentation": { "reveal": "always", "clear": true }
+        },
+        {
+            "label": "▶ Demo 1: iOS (Full)",
+            "dependsOn": [
+                "🍎 Ensure iOS Simulator",
+                "▶ Demo 1: iOS Generate Project",
+                "▶ Demo 1: iOS Build Framework",
+                "▶ Demo 1: iOS Build App"
+            ],
+            "dependsOrder": "sequence",
+            "group": "build",
+            "detail": "Boot simulator, generate project, build framework, build app",
+            "problemMatcher": []
+        },
+        {
+            "label": "▶ Demo 1: iOS Launch",
+            "dependsOn": ["▶ Demo 1: iOS (Full)"],
+            "type": "shell",
+            "command": "xcrun",
+            "args": [
+                "simctl", "install", "booted", 
+                "${workspaceFolder}/demo1_tiny_transformer/mobile-app/iosApp/build/Debug-iphonesimulator/iosApp.app",
+                "&&", "xcrun", "simctl", "launch", "booted", "org.example.iosApp"
+            ],
+            "group": "build",
+            "detail": "Install and launch iOS app on simulator",
+            "presentation": { "reveal": "silent" },
+            "problemMatcher": []
+        },
+        {
             "label": "▶ Demo 2: Desktop",
             "type": "shell",
             "command": "./gradlew",
@@ -70,13 +163,13 @@
             "presentation": { "reveal": "silent" }
         },
         {
-            "label": "▶ Demo 2: iOS Build XCFramework",
+            "label": "▶ Demo 2: iOS Build Framework",
             "type": "shell",
             "command": "./gradlew",
-            "args": [":composeApp:assembleSharedXCFramework"],
+            "args": [":composeApp:linkDebugFrameworkIosSimulatorArm64"],
             "options": { "cwd": "${workspaceFolder}/demo2_function_gemma" },
             "group": "build",
-            "detail": "Build Shared.xcframework",
+            "detail": "Build Shared.framework for simulator only (fast)",
             "presentation": { "reveal": "always", "clear": true }
         },
         {
@@ -86,8 +179,9 @@
             "args": [
                 "-project", "iosApp.xcodeproj",
                 "-scheme", "iosApp",
-                "-destination", "platform=iOS Simulator,name=iPhone 16",
+                "-destination", "platform=iOS Simulator,id=24BF1FED-6B05-479D-88B1-3E48AB3291B7",
                 "-configuration", "Debug",
+                "SYMROOT=build",
                 "build"
             ],
             "options": { "cwd": "${workspaceFolder}/demo2_function_gemma/iosApp" },
@@ -105,16 +199,52 @@
             "problemMatcher": []
         },
         {
+            "label": "▶ Demo 2: iOS Kill App",
+            "type": "shell",
+            "command": "xcrun",
+            "args": ["simctl", "terminate", "booted", "demo.functiongemma"],
+            "group": "build",
+            "detail": "Kill any running instance of the app",
+            "presentation": { "reveal": "silent" },
+            "problemMatcher": []
+        },
+        {
             "label": "▶ Demo 2: iOS (Full)",
             "dependsOn": [
                 "🍎 Ensure iOS Simulator",
                 "▶ Demo 2: iOS Generate Project",
-                "▶ Demo 2: iOS Build XCFramework",
+                "▶ Demo 2: iOS Build Framework",
                 "▶ Demo 2: iOS Build App"
             ],
             "dependsOrder": "sequence",
             "group": "build",
             "detail": "Boot simulator, generate project, build framework, build app",
+            "problemMatcher": []
+        },
+        {
+            "label": "▶ Demo 2: iOS Kill & Build",
+            "dependsOn": [
+                "▶ Demo 2: iOS Kill App",
+                "▶ Demo 2: iOS (Full)"
+            ],
+            "dependsOrder": "sequence",
+            "group": "build",
+            "detail": "Kill app, then build",
+            "problemMatcher": []
+        },
+        {
+            "label": "▶ Demo 2: iOS Launch",
+            "dependsOn": ["▶ Demo 2: iOS (Full)"],
+            "type": "shell",
+            "command": "xcrun",
+            "args": [
+                "simctl", "install", "booted", 
+                "${workspaceFolder}/demo2_function_gemma/iosApp/build/Debug-iphonesimulator/iosApp.app",
+                "&&", "xcrun", "simctl", "launch", "booted", "demo.functiongemma"
+            ],
+            "group": "build",
+            "detail": "Install and launch iOS app on simulator",
+            "presentation": { "reveal": "silent" },
             "problemMatcher": []
         },
         {

@@ -92,16 +92,43 @@ class AndroidLLMEngine(private val context: Context) : LLMEngine {
     
     private fun buildSystemPrompt(tools: List<Tool>): String {
         val sb = StringBuilder()
-        sb.append("You are a helpful assistant that can call functions.\n\n")
-        sb.append("Available functions:\n")
+        sb.append("You are a model that can do function calling with the following functions.\n\n")
+        sb.append("Available functions (in JSON Schema format):\n\n")
         
         for (tool in tools) {
-            sb.append("- ${tool.name}: ${tool.description}\n")
-            sb.append("  Parameters: ${tool.parameters}\n")
+            sb.append("{\n")
+            sb.append("  \"type\": \"function\",\n")
+            sb.append("  \"function\": {\n")
+            sb.append("    \"name\": \"${tool.name}\",\n")
+            sb.append("    \"description\": \"${tool.description}\",\n")
+            sb.append("    \"parameters\": {\n")
+            sb.append("      \"type\": \"object\",\n")
+            sb.append("      \"properties\": {\n")
+            
+            val params = tool.parameters["properties"] as? Map<*, *> ?: tool.parameters
+            val required = tool.parameters["required"] as? List<*> ?: emptyList<Any>()
+            
+            params.entries.forEachIndexed { index, entry ->
+                val paramName = entry.key as String
+                val paramDef = entry.value as? Map<*, *> ?: emptyMap<Any, Any>()
+                val paramType = paramDef["type"] as? String ?: "string"
+                val paramDesc = paramDef["description"] as? String ?: ""
+                
+                sb.append("        \"$paramName\": {\n")
+                sb.append("          \"type\": \"$paramType\",\n")
+                sb.append("          \"description\": \"$paramDesc\"\n")
+                sb.append("        }${if (index < params.size - 1) "," else ""}\n")
+            }
+            
+            sb.append("      },\n")
+            sb.append("      \"required\": ${required.map { "\"$it\"" }}\n")
+            sb.append("    }\n")
+            sb.append("  }\n")
+            sb.append("}\n\n")
         }
         
-        sb.append("\nTo call a function, use this format:\n")
-        sb.append("<start_function_call>call:function_name{param1:<escape>value1<escape>}<end_function_call>\n")
+        sb.append("When you need to call a function, respond with JSON in this exact format:\n")
+        sb.append("{\"name\": \"function_name\", \"arguments\": {\"param1\": \"value1\"}}\n")
         
         return sb.toString()
     }
@@ -116,19 +143,19 @@ class AndroidLLMEngine(private val context: Context) : LLMEngine {
     }
     
     private fun parseFunctionGemmaResponse(response: String): LLMResponse {
-        val functionCallRegex = """<start_function_call>call:(\w+)\{([^}]*)\}<end_function_call>""".toRegex()
+        val jsonRegex = """\{"name"\s*:\s*"(\w+)"\s*,\s*"arguments"\s*:\s*(\{[^}]*\})\}""".toRegex()
         
-        val match = functionCallRegex.find(response)
+        val match = jsonRegex.find(response)
         
         if (match != null) {
             val functionName = match.groupValues[1]
-            val paramsStr = match.groupValues[2]
+            val argsStr = match.groupValues[2]
             
             val params = mutableMapOf<String, String>()
-            val paramRegex = """(\w+):<escape>([^<]+?)<escape>""".toRegex()
+            val argRegex = """"(\w+)"\s*:\s*"([^"]*)"""".toRegex()
             
-            paramRegex.findAll(paramsStr).forEach { paramMatch ->
-                params[paramMatch.groupValues[1]] = paramMatch.groupValues[2]
+            argRegex.findAll(argsStr).forEach { argMatch ->
+                params[argMatch.groupValues[1]] = argMatch.groupValues[2]
             }
             
             return LLMResponse.FunctionCall(

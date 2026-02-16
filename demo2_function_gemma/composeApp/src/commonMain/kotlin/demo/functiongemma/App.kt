@@ -36,7 +36,7 @@ data class ChatMessage(
 
 val availableFunctions = listOf(
     FunctionDef("set_reminder", "Set a reminder for a specific time", listOf("title", "time")),
-    FunctionDef("navigate_to_screen", "Navigate to a specific screen", listOf("screen")),
+    FunctionDef("navigate_to_screen", "Navigate to a specific screen in the app", listOf("screen")),
     FunctionDef("toggle_setting", "Toggle a setting on or off", listOf("setting", "enabled")),
     FunctionDef("send_message", "Send a message to a contact", listOf("contact", "message")),
     FunctionDef("get_weather", "Get weather information for a location", listOf("location")),
@@ -111,13 +111,23 @@ fun App() {
                                 messages = messages + userMessage
                                 isLoading = true
                                 
-                                val tools = availableFunctions.map { func ->
-                                    Tool(
-                                        name = func.name,
-                                        description = func.description,
-                                        parameters = func.params.associateWith { "string" }
-                                    )
-                                }
+val tools = availableFunctions.map { func ->
+        val properties = func.params.associate {
+            it to mapOf(
+                "type" to "string",
+                "description" to "The ${it.replace("_", " ")} parameter"
+            )
+        }
+        Tool(
+            name = func.name,
+            description = func.description,
+            parameters = mapOf(
+                "type" to "object",
+                "properties" to properties,
+                "required" to func.params
+            )
+        )
+    }
                                 
                                 scope.launch {
                                     val response = llmEngine.generateResponse(inputText, tools)

@@ -93,16 +93,6 @@ int llama_set_system_prompt(LlamaContext ctx, const char* prompt) {
     internal->system_prompt = prompt ? prompt : "";
     internal->tokens.clear();
     
-    if (!internal->system_prompt.empty()) {
-        std::vector<llama_token> sys_tokens = common_tokenize(
-            internal->vocab, 
-            internal->system_prompt, 
-            true, 
-            true
-        );
-        internal->tokens.insert(internal->tokens.end(), sys_tokens.begin(), sys_tokens.end());
-    }
-    
     return 0;
 }
 
@@ -114,6 +104,18 @@ int llama_process_user_prompt(LlamaContext ctx, const char* prompt, int max_toke
         return -1;
     }
     
+    internal->tokens.clear();
+    
+    if (!internal->system_prompt.empty()) {
+        std::vector<llama_token> sys_tokens = common_tokenize(
+            internal->vocab, 
+            internal->system_prompt, 
+            true, 
+            true
+        );
+        internal->tokens.insert(internal->tokens.end(), sys_tokens.begin(), sys_tokens.end());
+    }
+    
     std::vector<llama_token> user_tokens = common_tokenize(
         internal->vocab, 
         std::string(prompt), 
@@ -121,12 +123,34 @@ int llama_process_user_prompt(LlamaContext ctx, const char* prompt, int max_toke
         true
     );
     
+    if (user_tokens.empty()) {
+        internal->last_error = "Failed to tokenize user prompt";
+        return -1;
+    }
+    
     internal->tokens.insert(internal->tokens.end(), user_tokens.begin(), user_tokens.end());
     
-    llama_batch batch = llama_batch_get_one(internal->tokens.data(), internal->tokens.size());
+    if (internal->tokens.empty()) {
+        internal->last_error = "No tokens to decode";
+        return -1;
+    }
     
-    if (llama_decode(internal->ctx, batch) != 0) {
-        internal->last_error = "Failed to decode prompt";
+    size_t n_tokens = internal->tokens.size();
+    llama_batch batch = llama_batch_init(n_tokens, 0, 1);
+    
+    for (size_t i = 0; i < n_tokens; i++) {
+        batch.token[i] = internal->tokens[i];
+        batch.pos[i] = i;
+        batch.logits[i] = false;
+    }
+    batch.n_tokens = n_tokens;
+    batch.logits[n_tokens - 1] = true;
+    
+    int result = llama_decode(internal->ctx, batch);
+    llama_batch_free(batch);
+    
+    if (result != 0) {
+        internal->last_error = "Failed to decode prompt (code: " + std::to_string(result) + ")";
         return -1;
     }
     
@@ -148,14 +172,25 @@ const char* llama_generate_next_token(LlamaContext ctx) {
     
     std::string token_str = common_token_to_piece(internal->vocab, new_token, true);
     
-    llama_batch batch = llama_batch_get_one(&new_token, 1);
-    if (llama_decode(internal->ctx, batch) != 0) {
+    internal->tokens.push_back(new_token);
+    
+    size_t n_tokens = internal->tokens.size();
+    llama_batch batch = llama_batch_init(1, 0, 1);
+    batch.token[0] = new_token;
+    batch.pos[0] = n_tokens - 1;
+    batch.logits[0] = true;
+    batch.n_tokens = 1;
+    
+    int result = llama_decode(internal->ctx, batch);
+    llama_batch_free(batch);
+    
+    if (result != 0) {
         return nullptr;
     }
     
-    static thread_local std::string result;
-    result = token_str;
-    return result.c_str();
+    static thread_local std::string result_str;
+    result_str = token_str;
+    return result_str.c_str();
 }
 
 void llama_reset_context(LlamaContext ctx) {

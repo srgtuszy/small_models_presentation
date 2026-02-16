@@ -18,11 +18,21 @@ lr = 3e-3
 eval_interval = 1000
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
-MESSAGES = [
-    "Hello", "Welcome", "Success", "Error", "Warning", "Please wait", "Done",
+MESSAGES_SINGLE = [
+    "Hello", "Welcome", "Success", "Error", "Warning", "Done",
     "Thank you", "Goodbye", "Try again", "Loading", "Saving", "Deleted",
     "Updated", "Created", "Failed", "Processing", "Complete", "Ready", "Busy"
 ]
+
+MESSAGES_MULTI = [
+    "Please wait", "File saved", "Connection lost", "Login successful",
+    "Operation failed", "Item deleted", "Changes saved", "Task completed",
+    "No results found", "Server error", "Access denied", "Invalid input",
+    "Welcome back", "Good morning", "See you later", "Happy coding",
+    "Hello world", "Test passed", "Build failed", "Sync complete"
+]
+
+MESSAGES = MESSAGES_SINGLE + MESSAGES_MULTI
 
 SCREENS = [
     "home", "settings", "profile", "dashboard", "login", "register",
