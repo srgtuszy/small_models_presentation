@@ -54,7 +54,10 @@ LlamaContext llama_create_context(const char* model_path, int n_ctx, int n_gpu_l
     
     llama_sampler_chain_params sampler_params = llama_sampler_chain_default_params();
     internal->sampler = llama_sampler_chain_init(sampler_params);
-    llama_sampler_chain_add(internal->sampler, llama_sampler_init_greedy());
+    llama_sampler_chain_add(internal->sampler, llama_sampler_init_temp(1.0f));
+    llama_sampler_chain_add(internal->sampler, llama_sampler_init_top_k(64));
+    llama_sampler_chain_add(internal->sampler, llama_sampler_init_top_p(0.95f, 1));
+    llama_sampler_chain_add(internal->sampler, llama_sampler_init_dist(0));
     
     internal->loaded = true;
     return internal;

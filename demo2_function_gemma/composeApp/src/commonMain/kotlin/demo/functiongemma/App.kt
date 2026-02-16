@@ -34,40 +34,54 @@ data class ChatMessage(
     val isError: Boolean = false
 )
 
-val availableFunctions = listOf(
-    FunctionDef("set_reminder", "Set a reminder for a specific time", listOf("title", "time")),
-    FunctionDef("navigate_to_screen", "Navigate to a specific screen in the app", listOf("screen")),
-    FunctionDef("toggle_setting", "Toggle a setting on or off", listOf("setting", "enabled")),
-    FunctionDef("send_message", "Send a message to a contact", listOf("contact", "message")),
-    FunctionDef("get_weather", "Get weather information for a location", listOf("location")),
-    FunctionDef("play_music", "Play a song by an artist", listOf("song", "artist")),
-    FunctionDef("set_timer", "Set a timer for a duration", listOf("duration")),
-    FunctionDef("make_call", "Make a phone call to a contact", listOf("contact"))
-)
-
-data class FunctionDef(
-    val name: String,
-    val description: String,
-    val params: List<String>
-)
-
 @Composable
 fun App() {
     MaterialTheme {
         var messages by remember { mutableStateOf(listOf<ChatMessage>()) }
         var inputText by remember { mutableStateOf("") }
         var messageId by remember { mutableStateOf(0) }
-        var selectedFunction by remember { mutableStateOf<FunctionDef?>(null) }
         var isLoading by remember { mutableStateOf(false) }
         var modelStatus by remember { mutableStateOf("Loading model...") }
+        var showDialog by remember { mutableStateOf(false) }
+        var dialogMessage by remember { mutableStateOf("") }
         
         val llmEngine = remember { createLLMEngine() }
         val scope = rememberCoroutineScope()
         
+        val alertTool = Tool(
+            name = "show_alert",
+            description = "Display an alert dialog with a message to the user",
+            parameters = mapOf(
+                "type" to "object",
+                "properties" to mapOf(
+                    "message" to mapOf(
+                        "type" to "string",
+                        "description" to "The message to display in the alert"
+                    )
+                ),
+                "required" to listOf("message")
+            )
+        )
+        
+        val replyTool = Tool(
+            name = "reply",
+            description = "Send a text response to the user for normal conversation",
+            parameters = mapOf(
+                "type" to "object",
+                "properties" to mapOf(
+                    "text" to mapOf(
+                        "type" to "string",
+                        "description" to "The text to send to the user"
+                    )
+                ),
+                "required" to listOf("text")
+            )
+        )
+        
         LaunchedEffect(Unit) {
             val error = llmEngine.initialize()
             modelStatus = if (error == null) {
-                "Model loaded ✓"
+                "Model loaded"
             } else {
                 "Model load failed: $error"
             }
@@ -78,232 +92,110 @@ fun App() {
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
         ) {
-            TopBar(modelStatus = modelStatus)
+            TopAppBar(
+                title = {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            Icons.Default.SmartToy,
+                            contentDescription = null,
+                            modifier = Modifier.size(28.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Column {
+                            Text(
+                                "Function Gemma",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 18.sp
+                            )
+                            Text(
+                                modelStatus,
+                                fontSize = 12.sp,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
+                            )
+                        }
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+            )
             
-            Row(modifier = Modifier.fillMaxSize().weight(1f)) {
-                Sidebar(
-                    functions = availableFunctions,
-                    selectedFunction = selectedFunction,
-                    onFunctionSelected = { selectedFunction = it }
-                )
-                
-                Column(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxHeight()
-                ) {
-                    ChatArea(
-                        messages = messages,
-                        isLoading = isLoading,
-                        modifier = Modifier.weight(1f)
-                    )
-                    
-                    InputArea(
-                        text = inputText,
-                        onTextChange = { inputText = it },
-                        onSend = {
-                            if (inputText.isNotBlank() && !isLoading) {
-                                val userMessage = ChatMessage(
+            ChatArea(
+                messages = messages,
+                isLoading = isLoading,
+                modifier = Modifier.weight(1f)
+            )
+            
+            InputArea(
+                text = inputText,
+                onTextChange = { inputText = it },
+                onSend = {
+                    if (inputText.isNotBlank() && !isLoading) {
+                        val messageText = inputText
+                        inputText = ""
+                        
+                        val userMessage = ChatMessage(
+                            id = messageId++,
+                            text = messageText,
+                            isUser = true
+                        )
+                        messages = messages + userMessage
+                        isLoading = true
+                        
+                        scope.launch {
+                            val response = llmEngine.generateResponse(messageText, listOf(alertTool))
+                            isLoading = false
+                            
+                            val responseMessage = when (response) {
+                                is LLMResponse.Text -> ChatMessage(
                                     id = messageId++,
-                                    text = inputText,
-                                    isUser = true
+                                    text = response.content,
+                                    isUser = false
                                 )
-                                messages = messages + userMessage
-                                isLoading = true
-                                
-val tools = availableFunctions.map { func ->
-        val properties = func.params.associate {
-            it to mapOf(
-                "type" to "string",
-                "description" to "The ${it.replace("_", " ")} parameter"
-            )
-        }
-        Tool(
-            name = func.name,
-            description = func.description,
-            parameters = mapOf(
-                "type" to "object",
-                "properties" to properties,
-                "required" to func.params
-            )
-        )
-    }
-                                
-                                scope.launch {
-                                    val response = llmEngine.generateResponse(inputText, tools)
-                                    isLoading = false
-                                    
-                                    val responseMessage = when (response) {
-                                        is LLMResponse.Text -> ChatMessage(
-                                            id = messageId++,
-                                            text = response.content,
-                                            isUser = false
+                                is LLMResponse.FunctionCall -> {
+                                    val message = response.result.arguments["message"] ?: "No message"
+                                    dialogMessage = message
+                                    showDialog = true
+                                    ChatMessage(
+                                        id = messageId++,
+                                        text = "Showing alert: \"$message\"",
+                                        isUser = false,
+                                        functionCall = FunctionCall(
+                                            name = response.result.name,
+                                            params = response.result.arguments,
+                                            timestamp = "now"
                                         )
-                                        is LLMResponse.FunctionCall -> ChatMessage(
-                                            id = messageId++,
-                                            text = "Function called: ${response.result.name}",
-                                            isUser = false,
-                                            functionCall = FunctionCall(
-                                                name = response.result.name,
-                                                params = response.result.arguments,
-                                                timestamp = "now"
-                                            )
-                                        )
-                                        is LLMResponse.Error -> ChatMessage(
-                                            id = messageId++,
-                                            text = response.message,
-                                            isUser = false,
-                                            isError = true
-                                        )
-                                    }
-                                    messages = messages + responseMessage
+                                    )
                                 }
-                                
-                                inputText = ""
-                            }
-                        },
-                        selectedFunction = selectedFunction,
-                        isLoading = isLoading
-                    )
+                                is LLMResponse.Error -> ChatMessage(
+                                    id = messageId++,
+                                    text = response.message,
+                                    isUser = false,
+                                    isError = true
+                                )
+}
+                            messages = messages + responseMessage
+                         }
+                     }
+                 },
+                isLoading = isLoading
+            )
+        }
+        
+        if (showDialog) {
+            AlertDialog(
+                onDismissRequest = { showDialog = false },
+                title = { Text("Alert") },
+                text = { Text(dialogMessage) },
+                confirmButton = {
+                    Button(onClick = { showDialog = false }) {
+                        Text("OK")
+                    }
                 }
-            }
+            )
         }
     }
-}
-
-@Composable
-fun TopBar(modelStatus: String) {
-    TopAppBar(
-        title = {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    Icons.Default.SmartToy,
-                    contentDescription = null,
-                    modifier = Modifier.size(28.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Column {
-                    Text(
-                        "Function Gemma Demo",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 18.sp
-                    )
-                    Text(
-                        modelStatus,
-                        fontSize = 12.sp,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
-                    )
-                }
-            }
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-        )
-    )
-}
-
-@Composable
-fun Sidebar(
-    functions: List<FunctionDef>,
-    selectedFunction: FunctionDef?,
-    onFunctionSelected: (FunctionDef) -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .width(220.dp)
-            .fillMaxHeight()
-            .background(MaterialTheme.colorScheme.surfaceVariant)
-            .padding(12.dp)
-    ) {
-        Text(
-            "Available Functions",
-            fontWeight = FontWeight.Bold,
-            fontSize = 14.sp,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        
-        Spacer(modifier = Modifier.height(8.dp))
-        
-        LazyColumn {
-            items(functions) { func ->
-                FunctionChip(
-                    func = func,
-                    isSelected = selectedFunction == func,
-                    onClick = { onFunctionSelected(func) }
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-            }
-        }
-        
-        Spacer(modifier = Modifier.height(16.dp))
-        
-        Card(
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.tertiaryContainer
-            )
-        ) {
-            Column(modifier = Modifier.padding(12.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        Icons.Default.Info,
-                        contentDescription = null,
-                        modifier = Modifier.size(16.dp),
-                        tint = MaterialTheme.colorScheme.onTertiaryContainer
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        "Model Info",
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onTertiaryContainer
-                    )
-                }
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    "FunctionGemma 270M\n~230MB (Q4_0)\n~0.3s TTFT\n~60 tok/s",
-                    fontSize = 11.sp,
-                    color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.8f)
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun FunctionChip(
-    func: FunctionDef,
-    isSelected: Boolean,
-    onClick: () -> Unit
-) {
-    FilterChip(
-        selected = isSelected,
-        onClick = onClick,
-        label = {
-            Column {
-                Text(func.name, fontSize = 12.sp, fontWeight = FontWeight.Medium)
-                Text(
-                    func.params.joinToString(", ") { it },
-                    fontSize = 10.sp,
-                    color = if (isSelected) 
-                        MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f)
-                    else 
-                        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-                )
-            }
-        },
-        leadingIcon = {
-            Icon(
-                Icons.Default.Code,
-                contentDescription = null,
-                modifier = Modifier.size(14.dp)
-            )
-        },
-        colors = FilterChipDefaults.filterChipColors(
-            selectedContainerColor = MaterialTheme.colorScheme.primary,
-            selectedLabelColor = MaterialTheme.colorScheme.onPrimary
-        )
-    )
 }
 
 @Composable
@@ -332,16 +224,16 @@ fun ChatArea(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 listOf(
-                    "Set a reminder for tomorrow at 5pm",
-                    "Navigate to settings",
-                    "Turn on dark mode",
-                    "What's the weather in Warsaw?"
+                    "Show an alert with message Hello World",
+                    "Display a popup saying Welcome",
+                    "Alert the user that the task is done"
                 ).forEach { example ->
                     Text(
                         "\"$example\"",
                         color = MaterialTheme.colorScheme.outline.copy(alpha = 0.7f),
                         fontSize = 13.sp
                     )
+                    Spacer(modifier = Modifier.height(4.dp))
                 }
             }
         }
@@ -494,65 +386,44 @@ fun InputArea(
     text: String,
     onTextChange: (String) -> Unit,
     onSend: () -> Unit,
-    selectedFunction: FunctionDef?,
     isLoading: Boolean
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shadowElevation = 8.dp
     ) {
-        Column(modifier = Modifier.padding(12.dp)) {
-            if (selectedFunction != null) {
-                AssistChip(
-                    onClick = { },
-                    label = {
-                        Text(
-                            "Target: ${selectedFunction.name}",
-                            fontSize = 11.sp
-                        )
-                    },
-                    leadingIcon = {
-                        Icon(
-                            Icons.Default.ArrowForward,
-                            contentDescription = null,
-                            modifier = Modifier.size(14.dp)
-                        )
-                    },
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-            }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            OutlinedTextField(
+                value = text,
+                onValueChange = onTextChange,
+                modifier = Modifier.weight(1f),
+                placeholder = { Text("Enter your command...") },
+                leadingIcon = {
+                    Icon(Icons.Default.Chat, contentDescription = null)
+                },
+                singleLine = true,
+                shape = RoundedCornerShape(24.dp)
+            )
             
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
+            Spacer(modifier = Modifier.width(8.dp))
+            
+            FilledIconButton(
+                onClick = onSend,
+                enabled = text.isNotBlank() && !isLoading
             ) {
-                OutlinedTextField(
-                    value = text,
-                    onValueChange = onTextChange,
-                    modifier = Modifier.weight(1f),
-                    placeholder = { Text("Enter your command...") },
-                    leadingIcon = {
-                        Icon(Icons.Default.Chat, contentDescription = null)
-                    },
-                    singleLine = true,
-                    shape = RoundedCornerShape(24.dp)
-                )
-                
-                Spacer(modifier = Modifier.width(8.dp))
-                
-                FilledIconButton(
-                    onClick = onSend,
-                    enabled = text.isNotBlank() && !isLoading
-                ) {
-                    if (isLoading) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(24.dp),
-                            strokeWidth = 2.dp,
-                            color = MaterialTheme.colorScheme.onPrimary
-                        )
-                    } else {
-                        Icon(Icons.Default.Send, contentDescription = "Send")
-                    }
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        strokeWidth = 2.dp,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                } else {
+                    Icon(Icons.Default.Send, contentDescription = "Send")
                 }
             }
         }

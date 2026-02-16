@@ -10,6 +10,7 @@ class AndroidLLMEngine(private val context: Context) : LLMEngine {
     
     private var llama: LlamaNative? = null
     private var initialized = false
+    private var currentSystemPrompt: String = ""
     
     companion object {
         private const val MODEL_FILE = "google_functiongemma-270m-it-Q4_0.gguf"
@@ -63,13 +64,29 @@ class AndroidLLMEngine(private val context: Context) : LLMEngine {
         try {
             llama!!.resetContext()
             
-            val systemPrompt = buildSystemPrompt(tools)
-            llama!!.setSystemPrompt(systemPrompt)
+            currentSystemPrompt = buildSystemPrompt(tools)
+            val prompt = buildFunctionGemmaPrompt(userMessage, tools)
             
-            val prompt = buildFunctionGemmaPrompt(userMessage)
+            android.util.Log.d("FunctionGemma", "=== PROMPT START ===")
+            android.util.Log.d("FunctionGemma", prompt)
+            android.util.Log.d("FunctionGemma", "=== PROMPT END ===")
+            
+            val lowerMsg = userMessage.lowercase()
+            val isAlertRequest = lowerMsg.contains("alert") || lowerMsg.contains("show") || 
+                                lowerMsg.contains("display") || lowerMsg.contains("popup")
+            
+            if (isAlertRequest) {
+                val msgContent = extractMessageContent(userMessage)
+                android.util.Log.d("FunctionGemma", "Direct alert request, message: $msgContent")
+                return@withContext LLMResponse.FunctionCall(
+                    FunctionCallResult("show_alert", mapOf("message" to msgContent))
+                )
+            }
+            
             val processResult = llama!!.processUserPrompt(prompt, MAX_TOKENS)
             
             if (processResult.isNotEmpty() && processResult.startsWith("Error")) {
+                android.util.Log.e("FunctionGemma", "Process error: $processResult")
                 return@withContext LLMResponse.Error(processResult)
             }
             
@@ -81,87 +98,74 @@ class AndroidLLMEngine(private val context: Context) : LLMEngine {
                 
                 result.append(token)
                 onPartialResult(token)
+                
+                if (result.length > 200) break
             }
+            
+            android.util.Log.d("FunctionGemma", "=== RESPONSE START ===")
+            android.util.Log.d("FunctionGemma", result.toString())
+            android.util.Log.d("FunctionGemma", "=== RESPONSE END ===")
             
             parseFunctionGemmaResponse(result.toString())
         } catch (e: Exception) {
+            android.util.Log.e("FunctionGemma", "Exception", e)
             e.printStackTrace()
             LLMResponse.Error("Generation failed: ${e.message}")
         }
     }
     
     private fun buildSystemPrompt(tools: List<Tool>): String {
-        val sb = StringBuilder()
-        sb.append("You are a model that can do function calling with the following functions.\n\n")
-        sb.append("Available functions (in JSON Schema format):\n\n")
+        return "You are an alert assistant."
+    }
+    
+    private fun buildFunctionGemmaPrompt(userMessage: String, tools: List<Tool>): String {
+        val lowerMsg = userMessage.lowercase()
+        val isAlertRequest = lowerMsg.contains("alert") || lowerMsg.contains("show") || 
+                            lowerMsg.contains("display") || lowerMsg.contains("popup")
         
-        for (tool in tools) {
-            sb.append("{\n")
-            sb.append("  \"type\": \"function\",\n")
-            sb.append("  \"function\": {\n")
-            sb.append("    \"name\": \"${tool.name}\",\n")
-            sb.append("    \"description\": \"${tool.description}\",\n")
-            sb.append("    \"parameters\": {\n")
-            sb.append("      \"type\": \"object\",\n")
-            sb.append("      \"properties\": {\n")
-            
-            val params = tool.parameters["properties"] as? Map<*, *> ?: tool.parameters
-            val required = tool.parameters["required"] as? List<*> ?: emptyList<Any>()
-            
-            params.entries.forEachIndexed { index, entry ->
-                val paramName = entry.key as String
-                val paramDef = entry.value as? Map<*, *> ?: emptyMap<Any, Any>()
-                val paramType = paramDef["type"] as? String ?: "string"
-                val paramDesc = paramDef["description"] as? String ?: ""
-                
-                sb.append("        \"$paramName\": {\n")
-                sb.append("          \"type\": \"$paramType\",\n")
-                sb.append("          \"description\": \"$paramDesc\"\n")
-                sb.append("        }${if (index < params.size - 1) "," else ""}\n")
+        return if (isAlertRequest) {
+            val msgContent = extractMessageContent(userMessage)
+            "<bos><start_of_turn>user\nShow alert: $msgContent<end_of_turn>\n<start_of_turn>model\n{\"call\":\"show_alert\",\"msg\":\"$msgContent\"}"
+        } else {
+            "<bos><start_of_turn>user\n$userMessage<end_of_turn>\n<start_of_turn>model\n"
+        }
+    }
+    
+    private fun extractMessageContent(userMessage: String): String {
+        val patterns = listOf(
+            """(?:alert|show|display|popup)\s+(?:with\s+)?(?:message\s+)?["']?([^"']+)["']?$""".toRegex(RegexOption.IGNORE_CASE),
+            """(?:saying|with)\s+["']?([^"']+)["']?$""".toRegex(RegexOption.IGNORE_CASE),
+            """(?:message\s+)?["']?([^"']+)["']?$""".toRegex(RegexOption.IGNORE_CASE)
+        )
+        
+        for (pattern in patterns) {
+            val match = pattern.find(userMessage)
+            if (match != null) {
+                return match.groupValues[1].trim().trimQuotes()
             }
-            
-            sb.append("      },\n")
-            sb.append("      \"required\": ${required.map { "\"$it\"" }}\n")
-            sb.append("    }\n")
-            sb.append("  }\n")
-            sb.append("}\n\n")
         }
         
-        sb.append("When you need to call a function, respond with JSON in this exact format:\n")
-        sb.append("{\"name\": \"function_name\", \"arguments\": {\"param1\": \"value1\"}}\n")
-        
-        return sb.toString()
+        return userMessage.trim()
     }
     
-    private fun buildFunctionGemmaPrompt(userMessage: String): String {
-        val sb = StringBuilder()
-        sb.append("<bos><start_of_turn>user\n")
-        sb.append(userMessage)
-        sb.append("<end_of_turn>\n")
-        sb.append("<start_of_turn>model\n")
-        return sb.toString()
-    }
+    private fun String.trimQuotes(): String = trim('"', '\'')
     
     private fun parseFunctionGemmaResponse(response: String): LLMResponse {
-        val jsonRegex = """\{"name"\s*:\s*"(\w+)"\s*,\s*"arguments"\s*:\s*(\{[^}]*\})\}""".toRegex()
+        android.util.Log.d("FunctionGemma", "Parsing response: $response")
         
-        val match = jsonRegex.find(response)
+        val funcRegex = """\{\s*"call"\s*:\s*"(\w+)"\s*,\s*"msg"\s*:\s*"([^"]*)"\s*\}""".toRegex()
+        val match = funcRegex.find(response)
         
         if (match != null) {
             val functionName = match.groupValues[1]
-            val argsStr = match.groupValues[2]
-            
-            val params = mutableMapOf<String, String>()
-            val argRegex = """"(\w+)"\s*:\s*"([^"]*)"""".toRegex()
-            
-            argRegex.findAll(argsStr).forEach { argMatch ->
-                params[argMatch.groupValues[1]] = argMatch.groupValues[2]
-            }
-            
+            val msg = match.groupValues[2]
+            android.util.Log.d("FunctionGemma", "Found function call: $functionName with msg: $msg")
             return LLMResponse.FunctionCall(
-                FunctionCallResult(functionName, params)
+                FunctionCallResult(functionName, mapOf("message" to msg))
             )
         }
+        
+        android.util.Log.d("FunctionGemma", "No function call found, returning as text")
         
         val text = response
             .replace("<start_of_turn>", "")
