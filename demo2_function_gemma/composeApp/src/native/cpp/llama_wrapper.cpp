@@ -41,7 +41,7 @@ LlamaContext llama_create_context(const char* model_path, int n_ctx, int n_gpu_l
     
     llama_context_params ctx_params = llama_context_default_params();
     ctx_params.n_ctx = internal->n_ctx;
-    ctx_params.n_batch = 512;
+    ctx_params.n_batch = internal->n_ctx;
     ctx_params.no_perf = true;
     
     internal->ctx = llama_init_from_model(internal->model, ctx_params);
@@ -141,10 +141,11 @@ int llama_process_user_prompt(LlamaContext ctx, const char* prompt, int max_toke
     for (size_t i = 0; i < n_tokens; i++) {
         batch.token[i] = internal->tokens[i];
         batch.pos[i] = i;
-        batch.logits[i] = false;
+        batch.n_seq_id[i] = 1;
+        batch.seq_id[i][0] = 0;
+        batch.logits[i] = (i == n_tokens - 1);
     }
     batch.n_tokens = n_tokens;
-    batch.logits[n_tokens - 1] = true;
     
     int result = llama_decode(internal->ctx, batch);
     llama_batch_free(batch);
@@ -178,6 +179,8 @@ const char* llama_generate_next_token(LlamaContext ctx) {
     llama_batch batch = llama_batch_init(1, 0, 1);
     batch.token[0] = new_token;
     batch.pos[0] = n_tokens - 1;
+    batch.n_seq_id[0] = 1;
+    batch.seq_id[0][0] = 0;
     batch.logits[0] = true;
     batch.n_tokens = 1;
     
