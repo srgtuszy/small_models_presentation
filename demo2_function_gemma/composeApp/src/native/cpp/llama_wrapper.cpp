@@ -10,6 +10,7 @@ struct LlamaContextInternal {
     llama_model* model = nullptr;
     llama_context* ctx = nullptr;
     llama_sampler* sampler = nullptr;
+    const llama_vocab* vocab = nullptr;
     std::vector<llama_token> tokens;
     std::string system_prompt;
     std::string last_error;
@@ -25,24 +26,28 @@ LlamaContext llama_create_context(const char* model_path, int n_ctx, int n_gpu_l
     internal->n_ctx = n_ctx > 0 ? n_ctx : 2048;
     internal->n_gpu_layers = n_gpu_layers;
     
+    llama_backend_init();
+    
     llama_model_params model_params = llama_model_default_params();
     model_params.n_gpu_layers = n_gpu_layers;
     
-    internal->model = llama_load_model_from_file(model_path, model_params);
+    internal->model = llama_model_load_from_file(model_path, model_params);
     if (!internal->model) {
         internal->last_error = "Failed to load model from: " + std::string(model_path);
         return internal;
     }
+    
+    internal->vocab = llama_model_get_vocab(internal->model);
     
     llama_context_params ctx_params = llama_context_default_params();
     ctx_params.n_ctx = internal->n_ctx;
     ctx_params.n_batch = 512;
     ctx_params.no_perf = true;
     
-    internal->ctx = llama_new_context_with_model(internal->model, ctx_params);
+    internal->ctx = llama_init_from_model(internal->model, ctx_params);
     if (!internal->ctx) {
         internal->last_error = "Failed to create context";
-        llama_free_model(internal->model);
+        llama_model_free(internal->model);
         internal->model = nullptr;
         return internal;
     }
@@ -65,7 +70,7 @@ void llama_destroy_context(LlamaContext ctx) {
             llama_free(internal->ctx);
         }
         if (internal->model) {
-            llama_free_model(internal->model);
+            llama_model_free(internal->model);
         }
         delete internal;
     }
@@ -89,8 +94,8 @@ int llama_set_system_prompt(LlamaContext ctx, const char* prompt) {
     internal->tokens.clear();
     
     if (!internal->system_prompt.empty()) {
-        std::vector<llama_token> sys_tokens = ::llama_tokenize(
-            internal->ctx, 
+        std::vector<llama_token> sys_tokens = common_tokenize(
+            internal->vocab, 
             internal->system_prompt, 
             true, 
             true
@@ -109,8 +114,8 @@ int llama_process_user_prompt(LlamaContext ctx, const char* prompt, int max_toke
         return -1;
     }
     
-    std::vector<llama_token> user_tokens = ::llama_tokenize(
-        internal->ctx, 
+    std::vector<llama_token> user_tokens = common_tokenize(
+        internal->vocab, 
         std::string(prompt), 
         false, 
         true
@@ -137,12 +142,11 @@ const char* llama_generate_next_token(LlamaContext ctx) {
     
     llama_token new_token = llama_sampler_sample(internal->sampler, internal->ctx, -1);
     
-    if (llama_token_is_eog(internal->model, new_token)) {
+    if (llama_vocab_is_eog(internal->vocab, new_token)) {
         return nullptr;
     }
     
-    std::vector<llama_token> token_vec = {new_token};
-    std::string token_str = llama_token_to_piece(internal->ctx, token_vec);
+    std::string token_str = common_token_to_piece(internal->vocab, new_token, true);
     
     llama_batch batch = llama_batch_get_one(&new_token, 1);
     if (llama_decode(internal->ctx, batch) != 0) {
@@ -159,7 +163,10 @@ void llama_reset_context(LlamaContext ctx) {
     auto* internal = static_cast<LlamaContextInternal*>(ctx);
     if (!internal->loaded) return;
     
-    llama_kv_cache_clear(internal->ctx);
+    llama_memory_t mem = llama_get_memory(internal->ctx);
+    if (mem) {
+        llama_memory_clear(mem, true);
+    }
     internal->tokens.clear();
     internal->system_prompt.clear();
 }
