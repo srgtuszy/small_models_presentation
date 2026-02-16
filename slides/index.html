@@ -15,13 +15,55 @@
             background: #191919;
         }
 
-        .reveal .slides section {
-            height: 100%;
+        /* Make slides fill viewport and use flexbox for vertical distribution */
+        .reveal .slides section,
+        .reveal .slides section.present,
+        .reveal .slides section.future,
+        .reveal .slides section.past,
+        .reveal .slides>section,
+        .reveal .slides>section>section {
+            height: 100% !important;
             top: 0 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: flex-start !important;
+            padding: 1em 1.2em !important;
+            box-sizing: border-box !important;
+            gap: 0.3em;
         }
 
         .reveal .slides section>* {
-            margin: 0.2em 0;
+            margin: 0;
+            flex-shrink: 0;
+        }
+
+        /* Key content elements grow to fill vertical space */
+        .reveal .slides section .cols,
+        .reveal .slides section .card,
+        .reveal .slides section .demo-box,
+        .reveal .slides section pre {
+            flex-grow: 1;
+            flex-shrink: 1;
+        }
+
+        .reveal .slides section .cols {
+            align-items: stretch;
+        }
+
+        /* Cards inside cols should grow to fill their column */
+        .reveal .cols>.card {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .reveal .cols>.card>ul,
+        .reveal .cols>.card>p {
+            flex-grow: 1;
+        }
+
+        /* Prevent speaker notes from being styled as flex content */
+        .reveal .slides section aside.notes {
+            display: none !important;
         }
 
         .reveal h1,
@@ -31,53 +73,56 @@
             text-transform: none;
             letter-spacing: -0.02em;
             font-weight: 700;
-            margin: 0.15em 0;
+            margin: 0.2em 0;
         }
 
         .reveal h1 {
-            font-size: 1.6em;
+            font-size: 2.2em;
         }
 
         .reveal h2 {
-            font-size: 1.2em;
-            margin-bottom: 0.3em;
+            font-size: 1.6em;
+            margin-bottom: 0.4em;
         }
 
         .reveal h3 {
-            font-size: 0.95em;
+            font-size: 1.25em;
         }
 
         .reveal h4 {
-            font-size: 0.8em;
-            margin-bottom: 0.1em;
+            font-size: 1.1em;
+            margin-bottom: 0.15em;
         }
 
         .reveal section {
             text-align: left;
         }
 
-        .reveal section.center {
+        .reveal section.center,
+        .reveal .slides section.center {
             text-align: center;
+            justify-content: center !important;
         }
 
         .reveal p {
-            margin: 0.2em 0;
-            font-size: 0.75em;
+            margin: 0.25em 0;
+            font-size: 1em;
         }
 
         .reveal .lead {
-            font-size: 0.9em;
-            margin: 0.3em 0;
+            font-size: 1.2em;
+            margin: 0.4em 0;
         }
 
         .reveal .sub {
             color: #888;
-            font-size: 0.65em;
+            font-size: 0.8em;
         }
 
         .reveal table {
-            margin: 0.2em 0;
-            font-size: 0.5em;
+            margin: 0.3em 0;
+            font-size: 0.8em;
+            width: 100%;
         }
 
         .reveal table th {
@@ -87,7 +132,7 @@
 
         .reveal table td,
         .reveal table th {
-            padding: 0.25em 0.5em;
+            padding: 0.35em 0.6em;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
@@ -105,8 +150,8 @@
         }
 
         .reveal .dim {
-            color: #666;
-            font-size: 0.85em;
+            color: #888;
+            font-size: 0.9em;
         }
 
         .reveal .warn {
@@ -115,25 +160,28 @@
 
         .reveal code:not([class]) {
             background: rgba(0, 0, 0, 0.4);
-            padding: 0.1em 0.3em;
-            border-radius: 3px;
-            font-size: 0.75em;
+            padding: 0.15em 0.35em;
+            border-radius: 4px;
+            font-size: 0.85em;
         }
 
         .reveal pre {
             width: 100%;
-            margin: 0.2em 0;
+            margin: 0.3em 0;
+            flex-grow: 1;
         }
 
         .reveal pre code {
-            padding: 0.5em;
-            font-size: 0.4em;
-            line-height: 1.3;
+            padding: 0.7em 0.9em;
+            font-size: 0.7em;
+            line-height: 1.5;
+            max-height: none;
+            border-radius: 8px;
         }
 
         .reveal .cols {
             display: flex;
-            gap: 0.8em;
+            gap: 1em;
             align-items: flex-start;
         }
 
@@ -144,14 +192,18 @@
         .reveal .card {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 6px;
-            padding: 0.4em;
-            margin: 0.2em 0;
-            font-size: 0.7em;
+            border-radius: 8px;
+            padding: 0.6em 0.8em;
+            margin: 0.25em 0;
+            font-size: 0.95em;
+        }
+
+        .reveal .card pre code {
+            font-size: 0.65em;
         }
 
         .reveal .big {
-            font-size: 1.8em;
+            font-size: 2.2em;
             font-weight: 700;
             color: #42affa;
             line-height: 1;
@@ -160,42 +212,43 @@
         .reveal .flow {
             display: flex;
             align-items: center;
-            gap: 0.3em;
-            font-size: 0.5em;
+            gap: 0.5em;
+            font-size: 0.85em;
             flex-wrap: wrap;
         }
 
         .reveal .flow .box {
             background: rgba(66, 175, 250, 0.2);
             border: 1px solid rgba(66, 175, 250, 0.4);
-            border-radius: 4px;
-            padding: 0.25em 0.4em;
+            border-radius: 6px;
+            padding: 0.35em 0.6em;
             white-space: nowrap;
         }
 
         .reveal .flow .arrow {
             color: #42affa;
+            font-size: 1.3em;
         }
 
         .reveal .demo-box {
             background: linear-gradient(135deg, rgba(66, 175, 250, 0.15), rgba(240, 168, 104, 0.15));
-            border-radius: 8px;
-            padding: 0.6em;
+            border-radius: 10px;
+            padding: 0.8em;
             text-align: center;
-            margin: 0.3em 0;
+            margin: 0.4em 0;
         }
 
         .reveal ul {
             list-style: none;
             padding: 0;
             margin: 0;
-            font-size: 0.65em;
+            font-size: 0.95em;
         }
 
         .reveal ul li {
             position: relative;
-            padding-left: 1em;
-            margin: 0.15em 0;
+            padding-left: 1.1em;
+            margin: 0.25em 0;
         }
 
         .reveal ul li::before {
@@ -207,44 +260,44 @@
 
         .reveal ol {
             margin: 0;
-            padding-left: 1.2em;
-            font-size: 0.65em;
+            padding-left: 1.4em;
+            font-size: 0.95em;
         }
 
         .reveal ol li {
-            margin: 0.15em 0;
+            margin: 0.25em 0;
         }
 
         .reveal .speaker-hint {
             position: absolute;
             bottom: 0.5em;
             right: 0.5em;
-            font-size: 0.4em;
+            font-size: 0.5em;
             color: #444;
             font-style: italic;
         }
 
         .reveal .example {
             background: rgba(139, 233, 192, 0.1);
-            border-left: 3px solid #8be9c0;
-            padding: 0.3em 0.5em;
-            margin: 0.3em 0;
-            font-size: 0.6em;
+            border-left: 4px solid #8be9c0;
+            padding: 0.5em 0.7em;
+            margin: 0.4em 0;
+            font-size: 0.9em;
         }
 
         .reveal .key-point {
-            border-left: 3px solid #42affa;
-            padding-left: 0.5em;
-            margin: 0.3em 0;
-            font-size: 0.7em;
+            border-left: 4px solid #42affa;
+            padding-left: 0.7em;
+            margin: 0.4em 0;
+            font-size: 1em;
         }
 
         .reveal .badge {
             display: inline-block;
             background: rgba(66, 175, 250, 0.3);
-            padding: 0.1em 0.4em;
-            border-radius: 3px;
-            font-size: 0.6em;
+            padding: 0.15em 0.5em;
+            border-radius: 4px;
+            font-size: 0.85em;
             margin-right: 0.3em;
         }
 
@@ -1415,7 +1468,22 @@ model.save_pretrained_gguf("model", tokenizer)</code></pre>
             slideNumber: 'c/t',
             transition: 'slide',
             embedded: false,
+            center: false,
+            width: 1920,
+            height: 1080,
+            margin: 0.04,
+            minScale: 0.2,
+            maxScale: 2.0,
             plugins: [RevealHighlight, RevealNotes]
+        }).then(() => {
+            // Force flex layout on all slides after Reveal.js has been fully initialized
+            document.querySelectorAll('.reveal .slides section').forEach(section => {
+                section.style.display = 'flex';
+                section.style.flexDirection = 'column';
+                section.style.justifyContent = section.classList.contains('center') ? 'center' : 'flex-start';
+                section.style.height = '100%';
+                section.style.top = '0';
+            });
         });
     </script>
 </body>
