@@ -252,8 +252,8 @@
                 </div>
                 <div class="cols">
                     <div class="card">
-                        <h4>3. Two Demos</h4>
-                        <p>From scratch to production</p>
+                        <h4>3. Fine-Tuning</h4>
+                        <p>Customize for your app</p>
                     </div>
                     <div class="card">
                         <h4>4. When to Use Them</h4>
@@ -678,6 +678,191 @@
                 </aside>
             </section>
 
+<!-- ===== SECTION: FINE-TUNING ===== -->
+
+<!-- Fine-Tuning Intro -->
+            <section>
+                <h2>Fine-Tuning FunctionGemma</h2>
+                <p class="lead">Customize for <span class="hl">your specific tools</span></p>
+                <div class="cols">
+                    <div class="card">
+                        <h4>Why Fine-Tune?</h4>
+                        <ul>
+                            <li>Learn your custom functions</li>
+                            <li>Improve accuracy from 58% → 85%+</li>
+                            <li>Match your app's terminology</li>
+                            <li>Reduce refusals</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>What You Need</h4>
+                        <ul>
+                            <li>Training data (100-1000 examples)</li>
+                            <li>GPU (Colab free tier works!)</li>
+                            <li>1-2 hours training time</li>
+                            <li>~10MB VRAM for 270M model</li>
+                        </ul>
+                    </div>
+                </div>
+                <aside class="notes">
+                    <p>FunctionGemma is designed to be fine-tuned - it's not a general chatbot.</p>
+                    <p>Train it on YOUR functions, YOUR terminology, YOUR use cases.</p>
+                    <p>The base model gets 58% on benchmarks. Fine-tuned: 85%+.</p>
+                    <p>270M parameters is small enough to train on free Google Colab!</p>
+                </aside>
+            </section>
+
+            <!-- Fine-Tuning Tools -->
+            <section>
+                <h2>Fine-Tuning Tools</h2>
+                <div class="cols">
+                    <div class="card">
+                        <h4>Unsloth <span class="badge green">Recommended</span></h4>
+                        <ul>
+                            <li>30x faster than standard</li>
+                            <li>90% less VRAM usage</li>
+                            <li>Works on free Colab</li>
+                            <li>Auto GGUF export</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>Hugging Face TRL</h4>
+                        <ul>
+                            <li>Standard approach</li>
+                            <li>More configurable</li>
+                            <li>Slower training</li>
+                            <li>Needs more VRAM</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="key-point">
+                    <p><span class="badge orange">Note</span> Unsloth requires NVIDIA GPU. Mac users: use Google Colab (free T4 GPU)</p>
+                </div>
+                <aside class="notes">
+                    <p>Unsloth is the fastest way to fine-tune LLMs.</p>
+                    <p>They hand-write GPU kernels for 30x speedup.</p>
+                    <p>Works on NVIDIA, AMD, Intel - but NOT Apple Silicon yet.</p>
+                    <p>For Mac: use Google Colab's free GPU tier.</p>
+                </aside>
+            </section>
+
+            <!-- Fine-Tuning Process -->
+            <section>
+                <h2>Fine-Tuning Process</h2>
+                <div class="flow" style="font-size: 0.55em; margin: 0.5em 0;">
+                    <span class="box">Training Data</span>
+                    <span class="arrow">→</span>
+                    <span class="box">LoRA Config</span>
+                    <span class="arrow">→</span>
+                    <span class="box">Train 1-2 hrs</span>
+                    <span class="arrow">→</span>
+                    <span class="box">Export GGUF</span>
+                    <span class="arrow">→</span>
+                    <span class="box" style="background: rgba(139, 233, 192, 0.2);">Mobile Ready!</span>
+                </div>
+                <div class="card">
+                    <h4>Training Data Format</h4>
+                    <pre><code class="language-json">{
+  "conversations": [
+    {"role": "user", "content": "Show alert hello"},
+    {"role": "assistant", "content": "{\"call\":\"show_alert\",\"msg\":\"hello\"}"}
+  ]
+}</code></pre>
+                </div>
+                <div class="cols">
+                    <div class="card">
+                        <h4>LoRA Benefits</h4>
+                        <ul>
+                            <li>Train only 1-5% of weights</li>
+                            <li>10x smaller checkpoints</li>
+                            <li>Can swap adapters</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>Hardware Needed</h4>
+                        <p>Free Colab T4: ✓ Works</p>
+                        <p>RX 6600 8GB: ✓ Works</p>
+                        <p>RTX 3060 12GB: ✓ Fast</p>
+                    </div>
+                </div>
+                <aside class="notes">
+                    <p>Training data is just input-output pairs.</p>
+                    <p>LoRA (Low-Rank Adaptation) lets you train huge models with tiny resources.</p>
+                    <p>Instead of updating all 270M parameters, you train ~1M adapters.</p>
+                    <p>A free Google Colab T4 GPU can train this in 1-2 hours.</p>
+                </aside>
+            </section>
+
+            <!-- Colab Notebook -->
+            <section>
+                <h2>Try It Now: Colab Notebook</h2>
+                <div class="demo-box">
+                    <p class="big" style="font-size: 1.2em;">1-Click Fine-Tune</p>
+                    <p style="font-size: 0.7em;">Open in Google Colab → Run all cells → Download GGUF</p>
+                </div>
+                <pre><code class="language-python"># Install Unsloth
+pip install "unsloth[colab-new]" 
+
+# Load FunctionGemma
+from unsloth import FastLanguageModel
+model, tokenizer = FastLanguageModel.from_pretrained(
+    "unsloth/functiongemma-270m-it"
+)
+
+# Configure LoRA
+model = FastLanguageModel.get_peft_model(
+    model,
+    r=16,           # LoRA rank
+    target_modules=["q_proj", "k_proj", "v_proj"],
+)
+
+# Train with your data
+from trl import SFTTrainer
+trainer = SFTTrainer(model, train_dataset=your_data)
+trainer.train()
+
+# Export for mobile
+model.save_pretrained_gguf("model", tokenizer)</code></pre>
+                <aside class="notes">
+                    <p>This is all you need - about 10 lines of code.</p>
+                    <p>Unsloth handles tokenization, chat templates, everything.</p>
+                    <p>The Colab notebook has all this ready to run.</p>
+                    <p>Export directly to GGUF format for llama.cpp/mobile use.</p>
+                </aside>
+            </section>
+
+            <!-- Fine-Tuning Results -->
+            <section>
+                <h2>Results: Before vs After</h2>
+                <div class="cols">
+                    <div class="card" style="border-color: rgba(255,107,107,0.5);">
+                        <h4 class="warn">Before Fine-Tuning</h4>
+                        <div class="example">
+                            <p><strong>User:</strong> "Show alert hello"</p>
+                            <p><strong>Model:</strong> "I cannot directly call functions..."</p>
+                        </div>
+                        <p class="dim">Base model doesn't know your tools</p>
+                    </div>
+                    <div class="card" style="border-color: rgba(139,233,192,0.5);">
+                        <h4 class="green">After Fine-Tuning</h4>
+                        <div class="example" style="background: rgba(139,233,192,0.1);">
+                            <p><strong>User:</strong> "Show alert hello"</p>
+                            <p><strong>Model:</strong> <span class="green">{"call":"show_alert","msg":"hello"}</span></p>
+                        </div>
+                        <p class="green">Correct function call!</p>
+                    </div>
+                </div>
+                <div class="key-point">
+                    <p>Just <span class="hl">1 hour</span> of fine-tuning transforms the model</p>
+                </div>
+                <aside class="notes">
+                    <p>Before: the model knows it should call functions, but not YOUR functions.</p>
+                    <p>After: it knows exactly what to call and how.</p>
+                    <p>This is the difference between 58% and 85%+ accuracy.</p>
+                    <p>And it only takes 1-2 hours on free Colab.</p>
+                </aside>
+            </section>
+
 <!-- ===== SECTION: DEPLOYMENT ===== -->
 
 <!-- Mobile Requirements -->
@@ -864,6 +1049,16 @@
                         </ul>
                     </div>
                     <div class="card">
+                        <h4>Fine-Tune FunctionGemma</h4>
+                        <ul>
+                            <li>Unsloth Colab Notebook</li>
+                            <li>Free T4 GPU on Colab</li>
+                            <li>1-click GGUF export</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="cols">
+                    <div class="card">
                         <h4>Start Building</h4>
                         <ul>
                             <li>MediaPipe LLM Inference</li>
@@ -871,16 +1066,17 @@
                             <li>TensorFlow Lite</li>
                         </ul>
                     </div>
-                </div>
-                <div class="demo-box">
-                    <h4>Today's Demos</h4>
-                    <code>demo1_tiny_transformer/</code> • <code>demo2_function_gemma/</code>
+                    <div class="card">
+                        <h4>Today's Demos</h4>
+                        <code>demo1_tiny_transformer/</code><br>
+                        <code>demo2_function_gemma/</code>
+                    </div>
                 </div>
                 <aside class="notes">
                     <p>NanoGPT is the best way to learn - Andrej Karpathy's minimal GPT.</p>
                     <p>Gemma models are free and well-documented.</p>
+                    <p>Unsloth Colab notebook lets you fine-tune in 1-2 hours for free.</p>
                     <p>MediaPipe is the easiest way to start on Android/iOS.</p>
-                    <p>All demos are in the project folder - ready to run.</p>
                 </aside>
             </section>
 

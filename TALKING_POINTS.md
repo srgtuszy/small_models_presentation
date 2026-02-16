@@ -21,12 +21,12 @@
 ```
 Input → Embed → [Transformer Block × N] → Output
                      ↓
-            ┌─────────────────┐
-            │ Self-Attention  │  ← "Look at other words"
-            │ + LayerNorm     │
-            │ + Feed-Forward  │  ← "Process the info"
-            │ + LayerNorm     │
-            └─────────────────┘
+             ┌─────────────────┐
+             │ Self-Attention  │  ← "Look at other words"
+             │ + LayerNorm     │
+             │ + Feed-Forward  │  ← "Process the info"
+             │ + LayerNorm     │
+             └─────────────────┘
 ```
 
 ### Key Components Explained Simply
@@ -111,6 +111,60 @@ Structured Output: set_alarm(time="7am")
 
 ---
 
+## Fine-Tuning FunctionGemma
+
+### Why Fine-Tune?
+
+Base FunctionGemma doesn't know YOUR functions. Fine-tuning:
+- Teaches your custom tool names
+- Improves accuracy 58% → 85%+
+- Matches your app's terminology
+- Reduces refusals
+
+### Tools Available
+
+**Unsloth (Recommended)**
+- 30x faster than standard training
+- 90% less VRAM usage
+- Works on free Google Colab (T4 GPU)
+- Auto exports to GGUF format
+- Requires NVIDIA/AMD/Intel GPU (not Apple Silicon)
+
+**Hardware Requirements**
+- Free Colab T4: ✓ Works (1-2 hours)
+- RX 6600 8GB: ✓ Works
+- RTX 3060 12GB: ✓ Fast
+- Mac M1/M2/M3: ✗ Not supported (use Colab)
+
+### Training Data Format
+
+```json
+{
+  "conversations": [
+    {"role": "user", "content": "Show alert hello"},
+    {"role": "assistant", "content": "{\"call\":\"show_alert\",\"msg\":\"hello\"}"}
+  ]
+}
+```
+
+### LoRA Benefits
+
+- Train only 1-5% of weights
+- 10x smaller checkpoints
+- Can swap adapters for different tools
+- Fits in consumer GPU memory
+
+### Process Overview
+
+1. Prepare training data (100-1000 examples)
+2. Load base model with Unsloth
+3. Configure LoRA adapters
+4. Train 1-2 hours
+5. Export to GGUF
+6. Deploy to mobile via llama.cpp
+
+---
+
 ## Embedding Models Explained
 
 ### What They Do
@@ -160,10 +214,11 @@ Text In → [Encoder] → Vector Out
 
 1. **You can build this** - A working transformer is ~150 lines of code
 2. **Size matters** - Match model size to task complexity
-3. **Privacy wins** - On-device = no data leaves the phone
-4. **Offline works** - No internet needed
-5. **Cost savings** - No per-token API fees
-6. **User experience** - <300ms latency vs 1-2s cloud calls
+3. **Fine-tuning is accessible** - Free Colab + 1 hour = custom model
+4. **Privacy wins** - On-device = no data leaves the phone
+5. **Offline works** - No internet needed
+6. **Cost savings** - No per-token API fees
+7. **User experience** - <300ms latency vs 1-2s cloud calls
 
 ---
 
@@ -171,5 +226,7 @@ Text In → [Encoder] → Vector Out
 
 - **NanoGPT:** Andrej Karpathy's minimal GPT implementation
 - **Gemma Models:** Google's open models for on-device AI
+- **Unsloth:** Fast fine-tuning library - works on free Colab
 - **MediaPipe:** Google's mobile ML inference framework
 - **llama.cpp:** Efficient CPU inference for edge devices
+- **FunctionGemma Colab:** 1-click fine-tuning notebook
