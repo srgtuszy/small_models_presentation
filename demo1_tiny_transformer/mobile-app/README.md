@@ -67,7 +67,7 @@ The model will be trained and copied to all platform assets automatically.
 
 2. The script will:
    - Generate synthetic training data
-   - Train a tiny transformer (~0.02M parameters)
+   - Train a tiny transformer (~0.8M parameters)
    - Export model weights to `model_output/`
    - Copy to mobile app assets
 

@@ -59,7 +59,7 @@ Input → Embed → [Transformer Block × N] → Output
 ```
 GPT-4: Knows everything, answers everything → 1.7T params
 Gemma 270M: Knows function calling, answers function calls → 270M params
-Tiny Transformer: Knows Shakespeare snippet → 0.02M params
+Tiny Transformer: Knows command parsing → ~0.8M params
 ```
 
 **Key insight:** Narrow the task → shrink the model
@@ -128,7 +128,7 @@ Base FunctionGemma doesn't know YOUR functions. Fine-tuning:
 - 90% less VRAM usage
 - Works on free Google Colab (T4 GPU)
 - Auto exports to GGUF format
-- Requires NVIDIA/AMD/Intel GPU (not Apple Silicon)
+- Supports NVIDIA, AMD, and Intel GPUs (not Apple Silicon)
 
 **Hardware Requirements**
 - Free Colab T4: ✓ Works (1-2 hours)
@@ -212,7 +212,7 @@ Text In → [Encoder] → Vector Out
 
 ## Key Takeaways for the Audience
 
-1. **You can build this** - A working transformer is ~150 lines of code
+1. **You can build this** - A working transformer is ~420 lines of well-commented Python
 2. **Size matters** - Match model size to task complexity
 3. **Fine-tuning is accessible** - Free Colab + 1 hour = custom model
 4. **Privacy wins** - On-device = no data leaves the phone

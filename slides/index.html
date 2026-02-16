@@ -729,7 +729,7 @@
                     </tr>
                     <tr>
                         <td>Tiny Transformer</td>
-                        <td class="green">20K params</td>
+                        <td class="green">~0.8M params</td>
                         <td class="dim">70%</td>
                         <td>Learning/Demo</td>
                     </tr>
@@ -778,8 +778,8 @@
             <section>
                 <h2>Demo 1: Build From Scratch</h2>
                 <div class="demo-box">
-                    <div class="big">~0.02M</div>
-                    <p class="dim">20,000 parameters • ~80KB</p>
+                    <div class="big">~0.8M</div>
+                    <p class="dim">809K parameters • ~3MB</p>
                     <p>Train in <span class="hl">2-3 minutes</span> on laptop</p>
                 </div>
                 <div class="cols">
@@ -788,14 +788,14 @@
                         <ul>
                             <li>Show it's just code, not magic</li>
                             <li>Same architecture as GPT</li>
-                            <li>~150 lines of Python</li>
+                            <li>~420 lines of Python</li>
                         </ul>
                     </div>
                     <div>
                         <h4>Architecture</h4>
                         <ul>
-                            <li>2 transformer layers</li>
-                            <li>2 attention heads</li>
+                            <li>4 transformer layers</li>
+                            <li>4 attention heads</li>
                             <li>128 embedding dimension</li>
                         </ul>
                     </div>
@@ -803,7 +803,7 @@
                 <aside class="notes">
                     <p>First demo: I'll show you how to BUILD a tiny transformer.</p>
                     <p>Why? To demystify it. It's not magic, it's math and code.</p>
-                    <p>This model has 20,000 parameters. GPT-4 has trillions.</p>
+                    <p>This model has ~800,000 parameters. GPT-4 has trillions.</p>
                     <p>But it uses the EXACT same architecture.</p>
                     <p>Trains in minutes, not months. Let's look at the code.</p>
                 </aside>
@@ -816,12 +816,12 @@
                 <pre><code class="language-python">class TinyTransformer(nn.Module):
     def __init__(self):
         self.tok_emb = nn.Embedding(vocab_size, 128)
-        self.pos_emb = nn.Embedding(128, 128)
+        self.pos_emb = nn.Embedding(80, 128)
         self.blocks = nn.Sequential(
-            Block(128, 2),  # Layer 1
-            Block(128, 2)   # Layer 2
+            *[Block() for _ in range(4)]  # 4 layers
         )
         self.head = nn.Linear(128, vocab_size)
+        self.head.weight = self.tok_emb.weight  # Weight tying
 
     def forward(self, x):
         tok = self.tok_emb(x)
@@ -846,7 +846,7 @@
                 <h2>Demo 2: FunctionGemma 270M</h2>
                 <div class="demo-box">
                     <div class="big">270M</div>
-                    <p class="dim">Parameters • ~288MB (INT4 quantized)</p>
+                    <p class="dim">Parameters • ~230MB (INT4 quantized)</p>
                     <p>Runs on <span class="hl">mid-range phones</span>, ~500MB RAM</p>
                 </div>
                 <div class="cols">
@@ -871,7 +871,7 @@
                 </div>
                 <aside class="notes">
                     <p>This is a real working app using llama.cpp.</p>
-                    <p>Model: FunctionGemma 270M, quantized to 4-bit (288MB).</p>
+                    <p>Model: FunctionGemma 270M, quantized to 4-bit (230MB).</p>
                     <p>Runs on mid-range Android and iPhone 12+.</p>
                     <p>Inference happens entirely on device - no network needed.</p>
                 </aside>
@@ -898,7 +898,7 @@
 ├─────────────────┤
 │  llama.cpp      │  ← C++ inference engine
 ├─────────────────┤
-│  GGUF Model     │  ← Quantized weights (288MB)
+│  GGUF Model     │  ← Quantized weights (230MB)
 └─────────────────┘</code></pre>
                 </div>
                 <aside class="notes">
@@ -967,13 +967,14 @@
                     </div>
                 </div>
                 <div class="key-point">
-                    <p><span class="badge orange">Note</span> Unsloth requires NVIDIA GPU. Mac users: use Google Colab
+                    <p><span class="badge orange">Note</span> Unsloth requires a GPU (NVIDIA, AMD, or Intel). Mac users:
+                        use Google Colab
                         (free T4 GPU)</p>
                 </div>
                 <aside class="notes">
                     <p>Unsloth is the fastest way to fine-tune LLMs.</p>
                     <p>They hand-write GPU kernels for 30x speedup.</p>
-                    <p>Works on NVIDIA, AMD, Intel - but NOT Apple Silicon yet.</p>
+                    <p>Works on NVIDIA, AMD, and Intel GPUs. Not Apple Silicon yet.</p>
                     <p>For Mac: use Google Colab's free GPU tier.</p>
                 </aside>
             </section>
@@ -1276,7 +1277,7 @@ model.save_pretrained_gguf("model", tokenizer)</code></pre>
                     <div class="card">
                         <div class="big">1</div>
                         <p>You can <span class="hl">build this</span></p>
-                        <p class="sub">~150 lines of code</p>
+                        <p class="sub">Just Python + PyTorch</p>
                     </div>
                     <div class="card">
                         <div class="big">2</div>

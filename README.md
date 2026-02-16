@@ -18,8 +18,8 @@ This repo proves it with two progressively complex demos:
 | | Demo 1 | Demo 2 |
 |---|---|---|
 | **Name** | Tiny Transformer | FunctionGemma |
-| **Params** | ~20K | 270M (Q4) |
-| **Size on disk** | ~80KB | ~230MB |
+| **Params** | ~800K | 270M (Q4) |
+| **Size on disk** | ~3MB | ~230MB |
 | **What it does** | Learns to parse commands → JSON | Production-grade function calling |
 | **Runs on** | Any laptop (CPU) | Android, iOS, Desktop |
 | **Training** | From scratch, 2-3 min | Fine-tuned with LoRA |
@@ -33,7 +33,7 @@ small_models/
 ├── slides/                        # Reveal.js presentation
 │   └── index.html                 # Full slide deck
 ├── demo1_tiny_transformer/        # Build a transformer from scratch
-│   ├── train_simple.py            # Training script (~150 lines)
+│   ├── train_simple.py            # Training script (~420 lines, well-commented)
 │   ├── generate_dataset.py        # Dataset generator
 │   ├── dataset.txt                # Pre-generated training data
 │   ├── model_output/              # Saved model weights & vocab
@@ -77,7 +77,7 @@ npm start
 
 ## 🔬 Demo 1: Tiny Transformer (From Scratch)
 
-**Goal:** Demystify transformers. Show that a working model is ~150 lines of Python.
+**Goal:** Demystify transformers. Show that a working transformer is just Python + PyTorch.
 
 A character-level transformer trained to parse natural language commands into structured JSON:
 
