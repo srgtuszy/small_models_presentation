@@ -68,24 +68,25 @@ fun App(
                 Button(
                     onClick = {
                         if (inputText.isNotBlank() && parser != null) {
-                            onParse(inputText) { command ->
-                                val jsonOutput = command?.let { 
-                                    when {
-                                        it.message != null -> """{"action": "${it.action}", "message": "${it.message}"}"""
-                                        it.target != null -> """{"action": "${it.action}", "target": "${it.target}"}"""
-                                        it.setting != null -> """{"action": "${it.action}", "setting": "${it.setting}"}"""
-                                        else -> """{"action": "${it.action}"}"""
-                                    }
-                                } ?: "Failed to parse command"
-                                
-                                outputText = jsonOutput
-                                lastCommand = command
-                                history.add(0, "Input: $inputText\nOutput: $jsonOutput")
-                                
-                                if (command?.action == "alert" && command.message != null) {
-                                    showDialog = true
-                                }
-                            }
+onParse(inputText) { command ->
+                val jsonOutput = command?.let { 
+                    when {
+                        it.isUnrecognized() -> """{"action": "unrecognized", "input": "${it.input}"}"""
+                        it.message != null -> """{"action": "${it.action}", "message": "${it.message}"}"""
+                        it.target != null -> """{"action": "${it.action}", "target": "${it.target}"}"""
+                        it.setting != null -> """{"action": "${it.action}", "setting": "${it.setting}"}"""
+                        else -> """{"action": "${it.action}"}"""
+                    }
+                } ?: "Failed to parse command"
+                
+                outputText = jsonOutput
+                lastCommand = command
+                history.add(0, "Input: $inputText\nOutput: $jsonOutput")
+                
+                if (command?.action == "alert" && command.message != null) {
+                    showDialog = true
+                }
+            }
                         }
                     },
                     modifier = Modifier.weight(1f),

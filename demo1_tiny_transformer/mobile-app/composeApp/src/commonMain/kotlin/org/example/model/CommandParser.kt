@@ -8,8 +8,11 @@ data class Command(
     val action: String,
     val message: String? = null,
     val target: String? = null,
-    val setting: String? = null
-)
+    val setting: String? = null,
+    val input: String? = null
+) {
+    fun isUnrecognized(): Boolean = action == "unrecognized"
+}
 
 class CommandParser(
     private val model: TinyTransformer,

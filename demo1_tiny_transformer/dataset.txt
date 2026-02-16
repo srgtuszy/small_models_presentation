@@ -1,0 +1,604 @@
+INPUT: show notification Call incoming OUTPUT: {"action": "alert", "message": "Call incoming"}
+INPUT: reload OUTPUT: {"action": "refresh"}
+INPUT: show downloads screen OUTPUT: {"action": "navigate", "target": "downloads"}
+INPUT: activate color_correction OUTPUT: {"action": "toggle", "setting": "color_correction"}
+INPUT: start auto_brightness OUTPUT: {"action": "toggle", "setting": "auto_brightness"}
+INPUT: show alert Empty OUTPUT: {"action": "alert", "message": "Empty"}
+INPUT: activate ambient_display OUTPUT: {"action": "toggle", "setting": "ambient_display"}
+INPUT: activate quiet_hours OUTPUT: {"action": "toggle", "setting": "quiet_hours"}
+INPUT: no OUTPUT: {"action": "unrecognized", "input": "no"}
+INPUT: show alert Processing OUTPUT: {"action": "alert", "message": "Processing"}
+INPUT: display message Maintenance scheduled OUTPUT: {"action": "alert", "message": "Maintenance scheduled"}
+INPUT: show message Recommended OUTPUT: {"action": "alert", "message": "Recommended"}
+INPUT: notify Build failed OUTPUT: {"action": "alert", "message": "Build failed"}
+INPUT: power on raise_to_wake OUTPUT: {"action": "toggle", "setting": "raise_to_wake"}
+INPUT: notify Preorder available OUTPUT: {"action": "alert", "message": "Preorder available"}
+INPUT: take me to security OUTPUT: {"action": "navigate", "target": "security"}
+INPUT: who OUTPUT: {"action": "unrecognized", "input": "who"}
+INPUT: activate auto_theme OUTPUT: {"action": "toggle", "setting": "auto_theme"}
+INPUT: switch to tasks OUTPUT: {"action": "navigate", "target": "tasks"}
+INPUT: take me to balance OUTPUT: {"action": "navigate", "target": "balance"}
+INPUT: i love you OUTPUT: {"action": "unrecognized", "input": "i love you"}
+INPUT: show notification Loading OUTPUT: {"action": "alert", "message": "Loading"}
+INPUT: send alert Downtime planned OUTPUT: {"action": "alert", "message": "Downtime planned"}
+INPUT: notify Subscription active OUTPUT: {"action": "alert", "message": "Subscription active"}
+INPUT: enable auto_download OUTPUT: {"action": "toggle", "setting": "auto_download"}
+INPUT: power on auto_backup OUTPUT: {"action": "toggle", "setting": "auto_backup"}
+INPUT: forget it OUTPUT: {"action": "unrecognized", "input": "forget it"}
+INPUT: display alert Task completed OUTPUT: {"action": "alert", "message": "Task completed"}
+INPUT: urgent OUTPUT: {"action": "unrecognized", "input": "urgent"}
+INPUT: exit OUTPUT: {"action": "close"}
+INPUT: sing a song OUTPUT: {"action": "unrecognized", "input": "sing a song"}
+INPUT: launch notifications OUTPUT: {"action": "toggle", "setting": "notifications"}
+INPUT: load link page OUTPUT: {"action": "navigate", "target": "link"}
+INPUT: activate spatial_audio OUTPUT: {"action": "toggle", "setting": "spatial_audio"}
+INPUT: i need help OUTPUT: {"action": "unrecognized", "input": "i need help"}
+INPUT: open businesses OUTPUT: {"action": "navigate", "target": "businesses"}
+INPUT: foo bar OUTPUT: {"action": "unrecognized", "input": "foo bar"}
+INPUT: start audio_description OUTPUT: {"action": "toggle", "setting": "audio_description"}
+INPUT: switch to developer OUTPUT: {"action": "navigate", "target": "developer"}
+INPUT: see you OUTPUT: {"action": "unrecognized", "input": "see you"}
+INPUT: view browse OUTPUT: {"action": "navigate", "target": "browse"}
+INPUT: activate backlight OUTPUT: {"action": "toggle", "setting": "backlight"}
+INPUT: enable picture_in_picture OUTPUT: {"action": "toggle", "setting": "picture_in_picture"}
+INPUT: notify Beta available OUTPUT: {"action": "alert", "message": "Beta available"}
+INPUT: turn on walking_mode OUTPUT: {"action": "toggle", "setting": "walking_mode"}
+INPUT: pop up Critical OUTPUT: {"action": "alert", "message": "Critical"}
+INPUT: jump to installation OUTPUT: {"action": "navigate", "target": "installation"}
+INPUT: activate password OUTPUT: {"action": "toggle", "setting": "password"}
+INPUT: end OUTPUT: {"action": "stop"}
+INPUT: show guide screen OUTPUT: {"action": "navigate", "target": "guide"}
+INPUT: set flash_notifications on OUTPUT: {"action": "toggle", "setting": "flash_notifications"}
+INPUT: start auto_archive OUTPUT: {"action": "toggle", "setting": "auto_archive"}
+INPUT: popup Refund processed OUTPUT: {"action": "alert", "message": "Refund processed"}
+INPUT: load moderation page OUTPUT: {"action": "navigate", "target": "moderation"}
+INPUT: notify Deadline approaching OUTPUT: {"action": "alert", "message": "Deadline approaching"}
+INPUT: why OUTPUT: {"action": "unrecognized", "input": "why"}
+INPUT: notify Help needed OUTPUT: {"action": "alert", "message": "Help needed"}
+INPUT: reset all OUTPUT: {"action": "reset"}
+INPUT: show notification Reservation confirmed OUTPUT: {"action": "alert", "message": "Reservation confirmed"}
+INPUT: switch to shipping OUTPUT: {"action": "navigate", "target": "shipping"}
+INPUT: greetings OUTPUT: {"action": "unrecognized", "input": "greetings"}
+INPUT: hi OUTPUT: {"action": "unrecognized", "input": "hi"}
+INPUT: show message Not found OUTPUT: {"action": "alert", "message": "Not found"}
+INPUT: qwerty OUTPUT: {"action": "unrecognized", "input": "qwerty"}
+INPUT: activate auto_rotate OUTPUT: {"action": "toggle", "setting": "auto_rotate"}
+INPUT: switch to files OUTPUT: {"action": "navigate", "target": "files"}
+INPUT: pop up Storage full OUTPUT: {"action": "alert", "message": "Storage full"}
+INPUT: take me to communities OUTPUT: {"action": "navigate", "target": "communities"}
+INPUT: visit approved OUTPUT: {"action": "navigate", "target": "approved"}
+INPUT: toggle fingerprint OUTPUT: {"action": "toggle", "setting": "fingerprint"}
+INPUT: launch flip_to_snooze OUTPUT: {"action": "toggle", "setting": "flip_to_snooze"}
+INPUT: show notification Comment added OUTPUT: {"action": "alert", "message": "Comment added"}
+INPUT: pop up Urgent OUTPUT: {"action": "alert", "message": "Urgent"}
+INPUT: restart OUTPUT: {"action": "restart"}
+INPUT: show bug screen OUTPUT: {"action": "navigate", "target": "bug"}
+INPUT: load timer page OUTPUT: {"action": "navigate", "target": "timer"}
+INPUT: visit muted OUTPUT: {"action": "navigate", "target": "muted"}
+INPUT: show message Booking complete OUTPUT: {"action": "alert", "message": "Booking complete"}
+INPUT: you suck OUTPUT: {"action": "unrecognized", "input": "you suck"}
+INPUT: notify Full OUTPUT: {"action": "alert", "message": "Full"}
+INPUT: start treble_boost OUTPUT: {"action": "toggle", "setting": "treble_boost"}
+INPUT: go to import OUTPUT: {"action": "navigate", "target": "import"}
+INPUT: activate reading_mode OUTPUT: {"action": "toggle", "setting": "reading_mode"}
+INPUT: show faq screen OUTPUT: {"action": "navigate", "target": "faq"}
+INPUT: toggle face_id OUTPUT: {"action": "toggle", "setting": "face_id"}
+INPUT: are you there OUTPUT: {"action": "unrecognized", "input": "are you there"}
+INPUT: launch game_mode OUTPUT: {"action": "toggle", "setting": "game_mode"}
+INPUT: load pending page OUTPUT: {"action": "navigate", "target": "pending"}
+INPUT: activate wake_lock OUTPUT: {"action": "toggle", "setting": "wake_lock"}
+INPUT: show alert Session expired OUTPUT: {"action": "alert", "message": "Session expired"}
+INPUT: popup Warning OUTPUT: {"action": "alert", "message": "Warning"}
+INPUT: beam me up OUTPUT: {"action": "unrecognized", "input": "beam me up"}
+INPUT: notify New follower OUTPUT: {"action": "alert", "message": "New follower"}
+INPUT: what OUTPUT: {"action": "unrecognized", "input": "what"}
+INPUT: send alert Email confirmed OUTPUT: {"action": "alert", "message": "Email confirmed"}
+INPUT: popup Contacts access OUTPUT: {"action": "alert", "message": "Contacts access"}
+INPUT: display alert New message OUTPUT: {"action": "alert", "message": "New message"}
+INPUT: show message Reminder OUTPUT: {"action": "alert", "message": "Reminder"}
+INPUT: show notification Security patch OUTPUT: {"action": "alert", "message": "Security patch"}
+INPUT: show help screen OUTPUT: {"action": "navigate", "target": "help"}
+INPUT: switch to traffic OUTPUT: {"action": "navigate", "target": "traffic"}
+INPUT: popup Computing OUTPUT: {"action": "alert", "message": "Computing"}
+INPUT: navigate to reports OUTPUT: {"action": "navigate", "target": "reports"}
+INPUT: show message Invite sent OUTPUT: {"action": "alert", "message": "Invite sent"}
+INPUT: what are you OUTPUT: {"action": "unrecognized", "input": "what are you"}
+INPUT: go back one OUTPUT: {"action": "back"}
+INPUT: switch equalizer OUTPUT: {"action": "toggle", "setting": "equalizer"}
+INPUT: alert Continue OUTPUT: {"action": "alert", "message": "Continue"}
+INPUT: engage OUTPUT: {"action": "unrecognized", "input": "engage"}
+INPUT: activate bold_text OUTPUT: {"action": "toggle", "setting": "bold_text"}
+INPUT: test OUTPUT: {"action": "unrecognized", "input": "test"}
+INPUT: activate keep_awake OUTPUT: {"action": "toggle", "setting": "keep_awake"}
+INPUT: show notification Found OUTPUT: {"action": "alert", "message": "Found"}
+INPUT: exit window OUTPUT: {"action": "close"}
+INPUT: activate eye_comfort OUTPUT: {"action": "toggle", "setting": "eye_comfort"}
+INPUT: show notification Next OUTPUT: {"action": "alert", "message": "Next"}
+INPUT: show feedback screen OUTPUT: {"action": "navigate", "target": "feedback"}
+INPUT: show alert Cancelled OUTPUT: {"action": "alert", "message": "Cancelled"}
+INPUT: pop up Resumed OUTPUT: {"action": "alert", "message": "Resumed"}
+INPUT: reload page OUTPUT: {"action": "refresh"}
+INPUT: enable flip_to_mute OUTPUT: {"action": "toggle", "setting": "flip_to_mute"}
+INPUT: toggle large_text OUTPUT: {"action": "toggle", "setting": "large_text"}
+INPUT: visit restore OUTPUT: {"action": "navigate", "target": "restore"}
+INPUT: play OUTPUT: {"action": "play"}
+INPUT: popup Sale ended OUTPUT: {"action": "alert", "message": "Sale ended"}
+INPUT: navigate to photos OUTPUT: {"action": "navigate", "target": "photos"}
+INPUT: visit hotels OUTPUT: {"action": "navigate", "target": "hotels"}
+INPUT: sup OUTPUT: {"action": "unrecognized", "input": "sup"}
+INPUT: open edit OUTPUT: {"action": "navigate", "target": "edit"}
+INPUT: popup Upgrade available OUTPUT: {"action": "alert", "message": "Upgrade available"}
+INPUT: how OUTPUT: {"action": "unrecognized", "input": "how"}
+INPUT: switch to preferences OUTPUT: {"action": "navigate", "target": "preferences"}
+INPUT: clear OUTPUT: {"action": "clear"}
+INPUT: pop up Case closed OUTPUT: {"action": "alert", "message": "Case closed"}
+INPUT: show message Calendar update OUTPUT: {"action": "alert", "message": "Calendar update"}
+INPUT: toggle sleep_timeout OUTPUT: {"action": "toggle", "setting": "sleep_timeout"}
+INPUT: visit points OUTPUT: {"action": "navigate", "target": "points"}
+INPUT: launch speaker OUTPUT: {"action": "toggle", "setting": "speaker"}
+INPUT: take me to dashboard OUTPUT: {"action": "navigate", "target": "dashboard"}
+INPUT: this is confusing OUTPUT: {"action": "unrecognized", "input": "this is confusing"}
+INPUT: show notification Checkout required OUTPUT: {"action": "alert", "message": "Checkout required"}
+INPUT: show optimization screen OUTPUT: {"action": "navigate", "target": "optimization"}
+INPUT: activate kids_mode OUTPUT: {"action": "toggle", "setting": "kids_mode"}
+INPUT: power on auto_save OUTPUT: {"action": "toggle", "setting": "auto_save"}
+INPUT: i am lost OUTPUT: {"action": "unrecognized", "input": "i am lost"}
+INPUT: enable auto_correct OUTPUT: {"action": "toggle", "setting": "auto_correct"}
+INPUT: view login OUTPUT: {"action": "navigate", "target": "login"}
+INPUT: how are you OUTPUT: {"action": "unrecognized", "input": "how are you"}
+INPUT: display alert Microphone access OUTPUT: {"action": "alert", "message": "Microphone access"}
+INPUT: set performance_mode on OUTPUT: {"action": "toggle", "setting": "performance_mode"}
+INPUT: activate high_contrast OUTPUT: {"action": "toggle", "setting": "high_contrast"}
+INPUT: congratulations OUTPUT: {"action": "unrecognized", "input": "congratulations"}
+INPUT: view sent OUTPUT: {"action": "navigate", "target": "sent"}
+INPUT: activate swipe_to_type OUTPUT: {"action": "toggle", "setting": "swipe_to_type"}
+INPUT: ping OUTPUT: {"action": "unrecognized", "input": "ping"}
+INPUT: popup Did you know OUTPUT: {"action": "alert", "message": "Did you know"}
+INPUT: take me to calendar OUTPUT: {"action": "navigate", "target": "calendar"}
+INPUT: show notification Task done OUTPUT: {"action": "alert", "message": "Task done"}
+INPUT: hello OUTPUT: {"action": "unrecognized", "input": "hello"}
+INPUT: activate screen_lock OUTPUT: {"action": "toggle", "setting": "screen_lock"}
+INPUT: previous OUTPUT: {"action": "back"}
+INPUT: power on auto_sort OUTPUT: {"action": "toggle", "setting": "auto_sort"}
+INPUT: navigate to topics OUTPUT: {"action": "navigate", "target": "topics"}
+INPUT: visit rejected OUTPUT: {"action": "navigate", "target": "rejected"}
+INPUT: show alert Payment received OUTPUT: {"action": "alert", "message": "Payment received"}
+INPUT: which OUTPUT: {"action": "unrecognized", "input": "which"}
+INPUT: open tutorial OUTPUT: {"action": "navigate", "target": "tutorial"}
+INPUT: send alert Changelog OUTPUT: {"action": "alert", "message": "Changelog"}
+INPUT: show insights screen OUTPUT: {"action": "navigate", "target": "insights"}
+INPUT: display alert Message received OUTPUT: {"action": "alert", "message": "Message received"}
+INPUT: send alert Searching OUTPUT: {"action": "alert", "message": "Searching"}
+INPUT: remove OUTPUT: {"action": "delete"}
+INPUT: enable talk_back OUTPUT: {"action": "toggle", "setting": "talk_back"}
+INPUT: notify Bug reported OUTPUT: {"action": "alert", "message": "Bug reported"}
+INPUT: jump to report OUTPUT: {"action": "navigate", "target": "report"}
+INPUT: show notification Check-in available OUTPUT: {"action": "alert", "message": "Check-in available"}
+INPUT: power on driving_mode OUTPUT: {"action": "toggle", "setting": "driving_mode"}
+INPUT: switch to ratings OUTPUT: {"action": "navigate", "target": "ratings"}
+INPUT: go back now OUTPUT: {"action": "back"}
+INPUT: begin OUTPUT: {"action": "start"}
+INPUT: pop up Access granted OUTPUT: {"action": "alert", "message": "Access granted"}
+INPUT: display message Released today OUTPUT: {"action": "alert", "message": "Released today"}
+INPUT: resume now OUTPUT: {"action": "resume"}
+INPUT: show message Previous OUTPUT: {"action": "alert", "message": "Previous"}
+INPUT: take me to trending OUTPUT: {"action": "navigate", "target": "trending"}
+INPUT: one two three OUTPUT: {"action": "unrecognized", "input": "one two three"}
+INPUT: send alert System update OUTPUT: {"action": "alert", "message": "System update"}
+INPUT: navigate to notes OUTPUT: {"action": "navigate", "target": "notes"}
+INPUT: set guest_mode on OUTPUT: {"action": "toggle", "setting": "guest_mode"}
+INPUT: open unlink OUTPUT: {"action": "navigate", "target": "unlink"}
+INPUT: activate timeout OUTPUT: {"action": "toggle", "setting": "timeout"}
+INPUT: reboot app OUTPUT: {"action": "restart"}
+INPUT: take me to flights OUTPUT: {"action": "navigate", "target": "flights"}
+INPUT: display alert Invite accepted OUTPUT: {"action": "alert", "message": "Invite accepted"}
+INPUT: pop up Paused OUTPUT: {"action": "alert", "message": "Paused"}
+INPUT: load checkout page OUTPUT: {"action": "navigate", "target": "checkout"}
+INPUT: power on auto_format OUTPUT: {"action": "toggle", "setting": "auto_format"}
+INPUT: switch braille_keyboard OUTPUT: {"action": "toggle", "setting": "braille_keyboard"}
+INPUT: visit account OUTPUT: {"action": "navigate", "target": "account"}
+INPUT: good luck OUTPUT: {"action": "unrecognized", "input": "good luck"}
+INPUT: send alert Mention received OUTPUT: {"action": "alert", "message": "Mention received"}
+INPUT: pong OUTPUT: {"action": "unrecognized", "input": "pong"}
+INPUT: open rewards OUTPUT: {"action": "navigate", "target": "rewards"}
+INPUT: set noise_cancellation on OUTPUT: {"action": "toggle", "setting": "noise_cancellation"}
+INPUT: activate volume OUTPUT: {"action": "toggle", "setting": "volume"}
+INPUT: activate auto_update OUTPUT: {"action": "toggle", "setting": "auto_update"}
+INPUT: go to bookmarks OUTPUT: {"action": "navigate", "target": "bookmarks"}
+INPUT: display message Settings saved OUTPUT: {"action": "alert", "message": "Settings saved"}
+INPUT: terminate OUTPUT: {"action": "stop"}
+INPUT: activate dark_mode OUTPUT: {"action": "toggle", "setting": "dark_mode"}
+INPUT: alert Restart required OUTPUT: {"action": "alert", "message": "Restart required"}
+INPUT: navigate to spam OUTPUT: {"action": "navigate", "target": "spam"}
+INPUT: send alert Hello OUTPUT: {"action": "alert", "message": "Hello"}
+INPUT: sure OUTPUT: {"action": "unrecognized", "input": "sure"}
+INPUT: take me to payments OUTPUT: {"action": "navigate", "target": "payments"}
+INPUT: show message Location access OUTPUT: {"action": "alert", "message": "Location access"}
+INPUT: show alert Info OUTPUT: {"action": "alert", "message": "Info"}
+INPUT: set two_factor on OUTPUT: {"action": "toggle", "setting": "two_factor"}
+INPUT: cool OUTPUT: {"action": "unrecognized", "input": "cool"}
+INPUT: play music OUTPUT: {"action": "unrecognized", "input": "play music"}
+INPUT: pop up Retry OUTPUT: {"action": "alert", "message": "Retry"}
+INPUT: display alert Syncing OUTPUT: {"action": "alert", "message": "Syncing"}
+INPUT: show alert Recovery setup OUTPUT: {"action": "alert", "message": "Recovery setup"}
+INPUT: lorem ipsum OUTPUT: {"action": "unrecognized", "input": "lorem ipsum"}
+INPUT: power on low_power OUTPUT: {"action": "toggle", "setting": "low_power"}
+INPUT: clear all OUTPUT: {"action": "clear"}
+INPUT: switch reduce_transparency OUTPUT: {"action": "toggle", "setting": "reduce_transparency"}
+INPUT: take me to private OUTPUT: {"action": "navigate", "target": "private"}
+INPUT: view favorites OUTPUT: {"action": "navigate", "target": "favorites"}
+INPUT: blah OUTPUT: {"action": "unrecognized", "input": "blah"}
+INPUT: maybe OUTPUT: {"action": "unrecognized", "input": "maybe"}
+INPUT: notify File saved OUTPUT: {"action": "alert", "message": "File saved"}
+INPUT: launch auto_delete OUTPUT: {"action": "toggle", "setting": "auto_delete"}
+INPUT: switch charging_sounds OUTPUT: {"action": "toggle", "setting": "charging_sounds"}
+INPUT: show weather screen OUTPUT: {"action": "navigate", "target": "weather"}
+INPUT: quit now OUTPUT: {"action": "close"}
+INPUT: switch to wallet OUTPUT: {"action": "navigate", "target": "wallet"}
+INPUT: ok OUTPUT: {"action": "unrecognized", "input": "ok"}
+INPUT: popup Skip OUTPUT: {"action": "alert", "message": "Skip"}
+INPUT: go to visible OUTPUT: {"action": "navigate", "target": "visible"}
+INPUT: switch auto_punctuate OUTPUT: {"action": "toggle", "setting": "auto_punctuate"}
+INPUT: display alert Consent required OUTPUT: {"action": "alert", "message": "Consent required"}
+INPUT: skip OUTPUT: {"action": "unrecognized", "input": "skip"}
+INPUT: what time is it OUTPUT: {"action": "unrecognized", "input": "what time is it"}
+INPUT: turn on auto_capitalize OUTPUT: {"action": "toggle", "setting": "auto_capitalize"}
+INPUT: make it so OUTPUT: {"action": "unrecognized", "input": "make it so"}
+INPUT: visit refunds OUTPUT: {"action": "navigate", "target": "refunds"}
+INPUT: delete OUTPUT: {"action": "delete"}
+INPUT: set battery_saver on OUTPUT: {"action": "toggle", "setting": "battery_saver"}
+INPUT: set bluetooth on OUTPUT: {"action": "toggle", "setting": "bluetooth"}
+INPUT: where am i OUTPUT: {"action": "unrecognized", "input": "where am i"}
+INPUT: show notification Done OUTPUT: {"action": "alert", "message": "Done"}
+INPUT: notify Notification OUTPUT: {"action": "alert", "message": "Notification"}
+INPUT: toggle switch_access OUTPUT: {"action": "toggle", "setting": "switch_access"}
+INPUT: show notification Initializing OUTPUT: {"action": "alert", "message": "Initializing"}
+INPUT: start location OUTPUT: {"action": "toggle", "setting": "location"}
+INPUT: never mind OUTPUT: {"action": "unrecognized", "input": "never mind"}
+INPUT: open tags OUTPUT: {"action": "navigate", "target": "tags"}
+INPUT: power on screen_sounds OUTPUT: {"action": "toggle", "setting": "screen_sounds"}
+INPUT: notify Release notes OUTPUT: {"action": "alert", "message": "Release notes"}
+INPUT: delete all OUTPUT: {"action": "delete"}
+INPUT: show notification Connected OUTPUT: {"action": "alert", "message": "Connected"}
+INPUT: testing OUTPUT: {"action": "unrecognized", "input": "testing"}
+INPUT: pause OUTPUT: {"action": "pause"}
+INPUT: start shake_to_undo OUTPUT: {"action": "toggle", "setting": "shake_to_undo"}
+INPUT: navigate to archive OUTPUT: {"action": "navigate", "target": "archive"}
+INPUT: remove all OUTPUT: {"action": "delete"}
+INPUT: open admin OUTPUT: {"action": "navigate", "target": "admin"}
+INPUT: alert Data exported OUTPUT: {"action": "alert", "message": "Data exported"}
+INPUT: close OUTPUT: {"action": "close"}
+INPUT: turn on auto_lock OUTPUT: {"action": "toggle", "setting": "auto_lock"}
+INPUT: navigate to events OUTPUT: {"action": "navigate", "target": "events"}
+INPUT: load reminders page OUTPUT: {"action": "navigate", "target": "reminders"}
+INPUT: notify Trial ending OUTPUT: {"action": "alert", "message": "Trial ending"}
+INPUT: test test test OUTPUT: {"action": "unrecognized", "input": "test test test"}
+INPUT: show message Please wait OUTPUT: {"action": "alert", "message": "Please wait"}
+INPUT: switch auto_sync OUTPUT: {"action": "toggle", "setting": "auto_sync"}
+INPUT: visit sync OUTPUT: {"action": "navigate", "target": "sync"}
+INPUT: happy new year OUTPUT: {"action": "unrecognized", "input": "happy new year"}
+INPUT: view maps OUTPUT: {"action": "navigate", "target": "maps"}
+INPUT: activate always_on_display OUTPUT: {"action": "toggle", "setting": "always_on_display"}
+INPUT: show message Important OUTPUT: {"action": "alert", "message": "Important"}
+INPUT: visit cart OUTPUT: {"action": "navigate", "target": "cart"}
+INPUT: alert Just launched OUTPUT: {"action": "alert", "message": "Just launched"}
+INPUT: open settings OUTPUT: {"action": "navigate", "target": "settings"}
+INPUT: switch mono_audio OUTPUT: {"action": "toggle", "setting": "mono_audio"}
+INPUT: switch to reviews OUTPUT: {"action": "navigate", "target": "reviews"}
+INPUT: cancel now OUTPUT: {"action": "cancel"}
+INPUT: stop OUTPUT: {"action": "stop"}
+INPUT: turn on display_timeout OUTPUT: {"action": "toggle", "setting": "display_timeout"}
+INPUT: take me to messages OUTPUT: {"action": "navigate", "target": "messages"}
+INPUT: pop up Fetching OUTPUT: {"action": "alert", "message": "Fetching"}
+INPUT: whats up OUTPUT: {"action": "unrecognized", "input": "whats up"}
+INPUT: visit answer OUTPUT: {"action": "navigate", "target": "answer"}
+INPUT: take me back OUTPUT: {"action": "back"}
+INPUT: activate lift_to_wake OUTPUT: {"action": "toggle", "setting": "lift_to_wake"}
+INPUT: show support screen OUTPUT: {"action": "navigate", "target": "support"}
+INPUT: view categories OUTPUT: {"action": "navigate", "target": "categories"}
+INPUT: abort OUTPUT: {"action": "cancel"}
+INPUT: show message Update installed OUTPUT: {"action": "alert", "message": "Update installed"}
+INPUT: refresh OUTPUT: {"action": "refresh"}
+INPUT: you are awesome OUTPUT: {"action": "unrecognized", "input": "you are awesome"}
+INPUT: go to returns OUTPUT: {"action": "navigate", "target": "returns"}
+INPUT: close now OUTPUT: {"action": "close"}
+INPUT: show alert Password changed OUTPUT: {"action": "alert", "message": "Password changed"}
+INPUT: hmm OUTPUT: {"action": "unrecognized", "input": "hmm"}
+INPUT: enable voice_over OUTPUT: {"action": "toggle", "setting": "voice_over"}
+INPUT: show message App removed OUTPUT: {"action": "alert", "message": "App removed"}
+INPUT: open outbox OUTPUT: {"action": "navigate", "target": "outbox"}
+INPUT: open recommendations OUTPUT: {"action": "navigate", "target": "recommendations"}
+INPUT: show notification Order placed OUTPUT: {"action": "alert", "message": "Order placed"}
+INPUT: enable pin OUTPUT: {"action": "toggle", "setting": "pin"}
+INPUT: asdf OUTPUT: {"action": "unrecognized", "input": "asdf"}
+INPUT: display alert Weather alert OUTPUT: {"action": "alert", "message": "Weather alert"}
+INPUT: you are terrible OUTPUT: {"action": "unrecognized", "input": "you are terrible"}
+INPUT: alert Alert OUTPUT: {"action": "alert", "message": "Alert"}
+INPUT: popup Stop OUTPUT: {"action": "alert", "message": "Stop"}
+INPUT: show alert Schedule changed OUTPUT: {"action": "alert", "message": "Schedule changed"}
+INPUT: take me to export OUTPUT: {"action": "navigate", "target": "export"}
+INPUT: yo OUTPUT: {"action": "unrecognized", "input": "yo"}
+INPUT: launch bass_boost OUTPUT: {"action": "toggle", "setting": "bass_boost"}
+INPUT: send alert Low battery OUTPUT: {"action": "alert", "message": "Low battery"}
+INPUT: set gps on OUTPUT: {"action": "toggle", "setting": "gps"}
+INPUT: turn on reduce_motion OUTPUT: {"action": "toggle", "setting": "reduce_motion"}
+INPUT: toggle keyboard_sounds OUTPUT: {"action": "toggle", "setting": "keyboard_sounds"}
+INPUT: show notification Access denied OUTPUT: {"action": "alert", "message": "Access denied"}
+INPUT: take me to deals OUTPUT: {"action": "navigate", "target": "deals"}
+INPUT: display message Meeting ended OUTPUT: {"action": "alert", "message": "Meeting ended"}
+INPUT: good evening OUTPUT: {"action": "unrecognized", "input": "good evening"}
+INPUT: show alert Delivery scheduled OUTPUT: {"action": "alert", "message": "Delivery scheduled"}
+INPUT: power on captions OUTPUT: {"action": "toggle", "setting": "captions"}
+INPUT: display alert Flight delayed OUTPUT: {"action": "alert", "message": "Flight delayed"}
+INPUT: reboot OUTPUT: {"action": "restart"}
+INPUT: switch reading_mode OUTPUT: {"action": "toggle", "setting": "reading_mode"}
+INPUT: display alert Disconnected OUTPUT: {"action": "alert", "message": "Disconnected"}
+INPUT: tell me a joke OUTPUT: {"action": "unrecognized", "input": "tell me a joke"}
+INPUT: abc123 OUTPUT: {"action": "unrecognized", "input": "abc123"}
+INPUT: turn on brightness OUTPUT: {"action": "toggle", "setting": "brightness"}
+INPUT: popup Permission required OUTPUT: {"action": "alert", "message": "Permission required"}
+INPUT: power on glide_typing OUTPUT: {"action": "toggle", "setting": "glide_typing"}
+INPUT: popup Storage low OUTPUT: {"action": "alert", "message": "Storage low"}
+INPUT: return OUTPUT: {"action": "back"}
+INPUT: go back OUTPUT: {"action": "back"}
+INPUT: show about screen OUTPUT: {"action": "navigate", "target": "about"}
+INPUT: show alert Two-factor enabled OUTPUT: {"action": "alert", "message": "Two-factor enabled"}
+INPUT: what is this OUTPUT: {"action": "unrecognized", "input": "what is this"}
+INPUT: toggle camera OUTPUT: {"action": "toggle", "setting": "camera"}
+INPUT: step back OUTPUT: {"action": "back"}
+INPUT: take me to groups OUTPUT: {"action": "navigate", "target": "groups"}
+INPUT: admin OUTPUT: {"action": "unrecognized", "input": "admin"}
+INPUT: display alert Issue resolved OUTPUT: {"action": "alert", "message": "Issue resolved"}
+INPUT: notify Trial started OUTPUT: {"action": "alert", "message": "Trial started"}
+INPUT: activate double_tap_to_wake OUTPUT: {"action": "toggle", "setting": "double_tap_to_wake"}
+INPUT: launch audio_normalization OUTPUT: {"action": "toggle", "setting": "audio_normalization"}
+INPUT: alert Error 404 OUTPUT: {"action": "alert", "message": "Error 404"}
+INPUT: go to schedule OUTPUT: {"action": "navigate", "target": "schedule"}
+INPUT: resume OUTPUT: {"action": "resume"}
+INPUT: launch select_to_speak OUTPUT: {"action": "toggle", "setting": "select_to_speak"}
+INPUT: power on auto_reply OUTPUT: {"action": "toggle", "setting": "auto_reply"}
+INPUT: alert Subscription expired OUTPUT: {"action": "alert", "message": "Subscription expired"}
+INPUT: what day is it OUTPUT: {"action": "unrecognized", "input": "what day is it"}
+INPUT: dance OUTPUT: {"action": "unrecognized", "input": "dance"}
+INPUT: launch notification_led OUTPUT: {"action": "toggle", "setting": "notification_led"}
+INPUT: password OUTPUT: {"action": "unrecognized", "input": "password"}
+INPUT: make me a sandwich OUTPUT: {"action": "unrecognized", "input": "make me a sandwich"}
+INPUT: hey OUTPUT: {"action": "unrecognized", "input": "hey"}
+INPUT: take me to question OUTPUT: {"action": "navigate", "target": "question"}
+INPUT: introduce yourself OUTPUT: {"action": "unrecognized", "input": "introduce yourself"}
+INPUT: start OUTPUT: {"action": "start"}
+INPUT: exit app OUTPUT: {"action": "close"}
+INPUT: send alert Success OUTPUT: {"action": "alert", "message": "Success"}
+INPUT: cancel OUTPUT: {"action": "cancel"}
+INPUT: emergency OUTPUT: {"action": "unrecognized", "input": "emergency"}
+INPUT: set auto_connect on OUTPUT: {"action": "toggle", "setting": "auto_connect"}
+INPUT: 123456 OUTPUT: {"action": "unrecognized", "input": "123456"}
+INPUT: show alert Promo code applied OUTPUT: {"action": "alert", "message": "Promo code applied"}
+INPUT: load queue page OUTPUT: {"action": "navigate", "target": "queue"}
+INPUT: switch to manage OUTPUT: {"action": "navigate", "target": "manage"}
+INPUT: popup Camera access OUTPUT: {"action": "alert", "message": "Camera access"}
+INPUT: can you hear me OUTPUT: {"action": "unrecognized", "input": "can you hear me"}
+INPUT: notify Channel subscribed OUTPUT: {"action": "alert", "message": "Channel subscribed"}
+INPUT: alert Discount active OUTPUT: {"action": "alert", "message": "Discount active"}
+INPUT: activate one_handed_mode OUTPUT: {"action": "toggle", "setting": "one_handed_mode"}
+INPUT: set screen_timeout on OUTPUT: {"action": "toggle", "setting": "screen_timeout"}
+INPUT: toggle auto_play OUTPUT: {"action": "toggle", "setting": "auto_play"}
+INPUT: display alert Group joined OUTPUT: {"action": "alert", "message": "Group joined"}
+INPUT: start vibration OUTPUT: {"action": "toggle", "setting": "vibration"}
+INPUT: visit uploads OUTPUT: {"action": "navigate", "target": "uploads"}
+INPUT: load following page OUTPUT: {"action": "navigate", "target": "following"}
+INPUT: jump to metrics OUTPUT: {"action": "navigate", "target": "metrics"}
+INPUT: navigate to console OUTPUT: {"action": "navigate", "target": "console"}
+INPUT: notify Good morning OUTPUT: {"action": "alert", "message": "Good morning"}
+INPUT: restart app OUTPUT: {"action": "restart"}
+INPUT: popup Coming soon OUTPUT: {"action": "alert", "message": "Coming soon"}
+INPUT: visit privacy OUTPUT: {"action": "navigate", "target": "privacy"}
+INPUT: display message Call ended OUTPUT: {"action": "alert", "message": "Call ended"}
+INPUT: alert App updated OUTPUT: {"action": "alert", "message": "App updated"}
+INPUT: switch to issue OUTPUT: {"action": "navigate", "target": "issue"}
+INPUT: popup Support requested OUTPUT: {"action": "alert", "message": "Support requested"}
+INPUT: jump to delete OUTPUT: {"action": "navigate", "target": "delete"}
+INPUT: display message System ready OUTPUT: {"action": "alert", "message": "System ready"}
+INPUT: notify Payment failed OUTPUT: {"action": "alert", "message": "Payment failed"}
+INPUT: display message Hello world OUTPUT: {"action": "alert", "message": "Hello world"}
+INPUT: notify Download started OUTPUT: {"action": "alert", "message": "Download started"}
+INPUT: set work_profile on OUTPUT: {"action": "toggle", "setting": "work_profile"}
+INPUT: display message Note OUTPUT: {"action": "alert", "message": "Note"}
+INPUT: display message Sale started OUTPUT: {"action": "alert", "message": "Sale started"}
+INPUT: activate microphone OUTPUT: {"action": "toggle", "setting": "microphone"}
+INPUT: set wifi on OUTPUT: {"action": "toggle", "setting": "wifi"}
+INPUT: sync now OUTPUT: {"action": "refresh"}
+INPUT: load explore page OUTPUT: {"action": "navigate", "target": "explore"}
+INPUT: show clock screen OUTPUT: {"action": "navigate", "target": "clock"}
+INPUT: show notification Boarding now OUTPUT: {"action": "alert", "message": "Boarding now"}
+INPUT: launch OUTPUT: {"action": "start"}
+INPUT: alert Update available OUTPUT: {"action": "alert", "message": "Update available"}
+INPUT: how do you do OUTPUT: {"action": "unrecognized", "input": "how do you do"}
+INPUT: display message Operation failed OUTPUT: {"action": "alert", "message": "Operation failed"}
+INPUT: take me to api OUTPUT: {"action": "navigate", "target": "api"}
+INPUT: whom OUTPUT: {"action": "unrecognized", "input": "whom"}
+INPUT: thank you OUTPUT: {"action": "unrecognized", "input": "thank you"}
+INPUT: show message Connection lost OUTPUT: {"action": "alert", "message": "Connection lost"}
+INPUT: jump to directions OUTPUT: {"action": "navigate", "target": "directions"}
+INPUT: show alert Privacy updated OUTPUT: {"action": "alert", "message": "Privacy updated"}
+INPUT: reload now OUTPUT: {"action": "refresh"}
+INPUT: launch freeform OUTPUT: {"action": "toggle", "setting": "freeform"}
+INPUT: open tracking OUTPUT: {"action": "navigate", "target": "tracking"}
+INPUT: load suggestions page OUTPUT: {"action": "navigate", "target": "suggestions"}
+INPUT: display alert Room ready OUTPUT: {"action": "alert", "message": "Room ready"}
+INPUT: turn on split_screen OUTPUT: {"action": "toggle", "setting": "split_screen"}
+INPUT: navigate to videos OUTPUT: {"action": "navigate", "target": "videos"}
+INPUT: stop now OUTPUT: {"action": "stop"}
+INPUT: navigate to alarms OUTPUT: {"action": "navigate", "target": "alarms"}
+INPUT: notify Completed OUTPUT: {"action": "alert", "message": "Completed"}
+INPUT: alert Finish OUTPUT: {"action": "alert", "message": "Finish"}
+INPUT: pause now OUTPUT: {"action": "pause"}
+INPUT: go to profile OUTPUT: {"action": "navigate", "target": "profile"}
+INPUT: echo OUTPUT: {"action": "unrecognized", "input": "echo"}
+INPUT: alert Analyzing OUTPUT: {"action": "alert", "message": "Analyzing"}
+INPUT: activate airplane_mode OUTPUT: {"action": "toggle", "setting": "airplane_mode"}
+INPUT: take me to transit OUTPUT: {"action": "navigate", "target": "transit"}
+INPUT: show notification Backup created OUTPUT: {"action": "alert", "message": "Backup created"}
+INPUT: show inbox screen OUTPUT: {"action": "navigate", "target": "inbox"}
+INPUT: view friends OUTPUT: {"action": "navigate", "target": "friends"}
+INPUT: open public OUTPUT: {"action": "navigate", "target": "public"}
+INPUT: popup Meeting started OUTPUT: {"action": "alert", "message": "Meeting started"}
+INPUT: good afternoon OUTPUT: {"action": "unrecognized", "input": "good afternoon"}
+INPUT: close app OUTPUT: {"action": "close"}
+INPUT: send alert Limited time offer OUTPUT: {"action": "alert", "message": "Limited time offer"}
+INPUT: jump to statistics OUTPUT: {"action": "navigate", "target": "statistics"}
+INPUT: display message Phone verified OUTPUT: {"action": "alert", "message": "Phone verified"}
+INPUT: fine OUTPUT: {"action": "unrecognized", "input": "fine"}
+INPUT: load contact page OUTPUT: {"action": "navigate", "target": "contact"}
+INPUT: alert Logout complete OUTPUT: {"action": "alert", "message": "Logout complete"}
+INPUT: pop up Bluetooth access OUTPUT: {"action": "alert", "message": "Bluetooth access"}
+INPUT: go to history OUTPUT: {"action": "navigate", "target": "history"}
+INPUT: pop up Like received OUTPUT: {"action": "alert", "message": "Like received"}
+INPUT: open the pod bay doors OUTPUT: {"action": "unrecognized", "input": "open the pod bay doors"}
+INPUT: merry christmas OUTPUT: {"action": "unrecognized", "input": "merry christmas"}
+INPUT: navigate to hidden OUTPUT: {"action": "navigate", "target": "hidden"}
+INPUT: navigate back OUTPUT: {"action": "back"}
+INPUT: alert Account verified OUTPUT: {"action": "alert", "message": "Account verified"}
+INPUT: set touch_sounds on OUTPUT: {"action": "toggle", "setting": "touch_sounds"}
+INPUT: activate double_tap_to_sleep OUTPUT: {"action": "toggle", "setting": "double_tap_to_sleep"}
+INPUT: turn on audio_balance OUTPUT: {"action": "toggle", "setting": "audio_balance"}
+INPUT: toggle pinch_to_zoom OUTPUT: {"action": "toggle", "setting": "pinch_to_zoom"}
+INPUT: show alert Error OUTPUT: {"action": "alert", "message": "Error"}
+INPUT: send alert Stock low OUTPUT: {"action": "alert", "message": "Stock low"}
+INPUT: popup Loading data OUTPUT: {"action": "alert", "message": "Loading data"}
+INPUT: refresh content OUTPUT: {"action": "refresh"}
+INPUT: alert Welcome OUTPUT: {"action": "alert", "message": "Welcome"}
+INPUT: halt OUTPUT: {"action": "stop"}
+INPUT: whose OUTPUT: {"action": "unrecognized", "input": "whose"}
+INPUT: show alert Popular choice OUTPUT: {"action": "alert", "message": "Popular choice"}
+INPUT: view stopwatch OUTPUT: {"action": "navigate", "target": "stopwatch"}
+INPUT: take me to blocked OUTPUT: {"action": "navigate", "target": "blocked"}
+INPUT: view documentation OUTPUT: {"action": "navigate", "target": "documentation"}
+INPUT: set bedtime_mode on OUTPUT: {"action": "toggle", "setting": "bedtime_mode"}
+INPUT: send alert Files access OUTPUT: {"action": "alert", "message": "Files access"}
+INPUT: show alert Test OUTPUT: {"action": "alert", "message": "Test"}
+INPUT: power on auto_fill OUTPUT: {"action": "toggle", "setting": "auto_fill"}
+INPUT: toggle gesture_typing OUTPUT: {"action": "toggle", "setting": "gesture_typing"}
+INPUT: show message Terms accepted OUTPUT: {"action": "alert", "message": "Terms accepted"}
+INPUT: send alert Ready OUTPUT: {"action": "alert", "message": "Ready"}
+INPUT: alert Gate changed OUTPUT: {"action": "alert", "message": "Gate changed"}
+INPUT: display alert Online OUTPUT: {"action": "alert", "message": "Online"}
+INPUT: goodbye OUTPUT: {"action": "unrecognized", "input": "goodbye"}
+INPUT: display alert Flight cancelled OUTPUT: {"action": "alert", "message": "Flight cancelled"}
+INPUT: send alert Start OUTPUT: {"action": "alert", "message": "Start"}
+INPUT: hello world OUTPUT: {"action": "unrecognized", "input": "hello world"}
+INPUT: switch to navigation OUTPUT: {"action": "navigate", "target": "navigation"}
+INPUT: refresh page OUTPUT: {"action": "refresh"}
+INPUT: show alert Task assigned OUTPUT: {"action": "alert", "message": "Task assigned"}
+INPUT: thanks OUTPUT: {"action": "unrecognized", "input": "thanks"}
+INPUT: what can you do OUTPUT: {"action": "unrecognized", "input": "what can you do"}
+INPUT: alert Offline OUTPUT: {"action": "alert", "message": "Offline"}
+INPUT: toggle night_mode OUTPUT: {"action": "toggle", "setting": "night_mode"}
+INPUT: help OUTPUT: {"action": "unrecognized", "input": "help"}
+INPUT: switch to notifications OUTPUT: {"action": "navigate", "target": "notifications"}
+INPUT: exit now OUTPUT: {"action": "close"}
+INPUT: activate key_backlight OUTPUT: {"action": "toggle", "setting": "key_backlight"}
+INPUT: refresh now OUTPUT: {"action": "refresh"}
+INPUT: pop up Event reminder OUTPUT: {"action": "alert", "message": "Event reminder"}
+INPUT: visit backup OUTPUT: {"action": "navigate", "target": "backup"}
+INPUT: activate auto_forward OUTPUT: {"action": "toggle", "setting": "auto_forward"}
+INPUT: open search OUTPUT: {"action": "navigate", "target": "search"}
+INPUT: popup Import complete OUTPUT: {"action": "alert", "message": "Import complete"}
+INPUT: display message Feedback received OUTPUT: {"action": "alert", "message": "Feedback received"}
+INPUT: help me OUTPUT: {"action": "unrecognized", "input": "help me"}
+INPUT: display message Order shipped OUTPUT: {"action": "alert", "message": "Order shipped"}
+INPUT: popup Share received OUTPUT: {"action": "alert", "message": "Share received"}
+INPUT: switch focus_mode OUTPUT: {"action": "toggle", "setting": "focus_mode"}
+INPUT: go to projects OUTPUT: {"action": "navigate", "target": "projects"}
+INPUT: update view OUTPUT: {"action": "refresh"}
+INPUT: open analytics OUTPUT: {"action": "navigate", "target": "analytics"}
+INPUT: random OUTPUT: {"action": "unrecognized", "input": "random"}
+INPUT: send alert Sync complete OUTPUT: {"action": "alert", "message": "Sync complete"}
+INPUT: show coupons screen OUTPUT: {"action": "navigate", "target": "coupons"}
+INPUT: close window OUTPUT: {"action": "close"}
+INPUT: open share OUTPUT: {"action": "navigate", "target": "share"}
+INPUT: show alert Cache cleared OUTPUT: {"action": "alert", "message": "Cache cleared"}
+INPUT: undo OUTPUT: {"action": "back"}
+INPUT: send alert App installed OUTPUT: {"action": "alert", "message": "App installed"}
+INPUT: navigate to offers OUTPUT: {"action": "navigate", "target": "offers"}
+INPUT: show shops screen OUTPUT: {"action": "navigate", "target": "shops"}
+INPUT: display alert Saving OUTPUT: {"action": "alert", "message": "Saving"}
+INPUT: show notification Data reset OUTPUT: {"action": "alert", "message": "Data reset"}
+INPUT: show alert Timeout OUTPUT: {"action": "alert", "message": "Timeout"}
+INPUT: alert Scanning OUTPUT: {"action": "alert", "message": "Scanning"}
+INPUT: salutations OUTPUT: {"action": "unrecognized", "input": "salutations"}
+INPUT: ignore this OUTPUT: {"action": "unrecognized", "input": "ignore this"}
+INPUT: visit channels OUTPUT: {"action": "navigate", "target": "channels"}
+INPUT: activate haptic_feedback OUTPUT: {"action": "toggle", "setting": "haptic_feedback"}
+INPUT: take me to followers OUTPUT: {"action": "navigate", "target": "followers"}
+INPUT: load drafts page OUTPUT: {"action": "navigate", "target": "drafts"}
+INPUT: open performance OUTPUT: {"action": "navigate", "target": "performance"}
+INPUT: display message New feature OUTPUT: {"action": "alert", "message": "New feature"}
+INPUT: notify Friend request OUTPUT: {"action": "alert", "message": "Friend request"}
+INPUT: send alert Restore complete OUTPUT: {"action": "alert", "message": "Restore complete"}
+INPUT: toggle lock_sounds OUTPUT: {"action": "toggle", "setting": "lock_sounds"}
+INPUT: show message Charging OUTPUT: {"action": "alert", "message": "Charging"}
+INPUT: set do_not_disturb on OUTPUT: {"action": "toggle", "setting": "do_not_disturb"}
+INPUT: alert Out of stock OUTPUT: {"action": "alert", "message": "Out of stock"}
+INPUT: take me to credits OUTPUT: {"action": "navigate", "target": "credits"}
+INPUT: show message Process running OUTPUT: {"action": "alert", "message": "Process running"}
+INPUT: jump to restaurants OUTPUT: {"action": "navigate", "target": "restaurants"}
+INPUT: good morning OUTPUT: {"action": "unrecognized", "input": "good morning"}
+INPUT: set wave_to_wake on OUTPUT: {"action": "toggle", "setting": "wave_to_wake"}
+INPUT: who are you OUTPUT: {"action": "unrecognized", "input": "who are you"}
+INPUT: pass OUTPUT: {"action": "unrecognized", "input": "pass"}
+INPUT: activate subtitles OUTPUT: {"action": "toggle", "setting": "subtitles"}
+INPUT: back OUTPUT: {"action": "back"}
+INPUT: notify Profile updated OUTPUT: {"action": "alert", "message": "Profile updated"}
+INPUT: yes OUTPUT: {"action": "unrecognized", "input": "yes"}
+INPUT: bye OUTPUT: {"action": "unrecognized", "input": "bye"}
+INPUT: where OUTPUT: {"action": "unrecognized", "input": "where"}
+INPUT: show home screen OUTPUT: {"action": "navigate", "target": "home"}
+INPUT: good night OUTPUT: {"action": "unrecognized", "input": "good night"}
+INPUT: jump to configuration OUTPUT: {"action": "navigate", "target": "configuration"}
+INPUT: visit discover OUTPUT: {"action": "navigate", "target": "discover"}
+INPUT: okay OUTPUT: {"action": "unrecognized", "input": "okay"}
+INPUT: show update screen OUTPUT: {"action": "navigate", "target": "update"}
+INPUT: jump to recent OUTPUT: {"action": "navigate", "target": "recent"}
+INPUT: whatever OUTPUT: {"action": "unrecognized", "input": "whatever"}
+INPUT: navigate to documents OUTPUT: {"action": "navigate", "target": "documents"}
+INPUT: i dont know OUTPUT: {"action": "unrecognized", "input": "i dont know"}
+INPUT: open posts OUTPUT: {"action": "navigate", "target": "posts"}
+INPUT: quit OUTPUT: {"action": "close"}
+INPUT: jump to setup OUTPUT: {"action": "navigate", "target": "setup"}
+INPUT: navigate to invite OUTPUT: {"action": "navigate", "target": "invite"}
+INPUT: enable surround_sound OUTPUT: {"action": "toggle", "setting": "surround_sound"}
+INPUT: reset OUTPUT: {"action": "reset"}
+INPUT: popup Back in stock OUTPUT: {"action": "alert", "message": "Back in stock"}
+INPUT: alert Factory reset OUTPUT: {"action": "alert", "message": "Factory reset"}
+INPUT: go to connect OUTPUT: {"action": "navigate", "target": "connect"}
+INPUT: set blue_light_filter on OUTPUT: {"action": "toggle", "setting": "blue_light_filter"}
+INPUT: nice OUTPUT: {"action": "unrecognized", "input": "nice"}
+INPUT: umm OUTPUT: {"action": "unrecognized", "input": "umm"}
+INPUT: show notification Upload complete OUTPUT: {"action": "alert", "message": "Upload complete"}
+INPUT: visit chat OUTPUT: {"action": "navigate", "target": "chat"}
+INPUT: repeat OUTPUT: {"action": "unrecognized", "input": "repeat"}
+INPUT: pop up Login successful OUTPUT: {"action": "alert", "message": "Login successful"}
+INPUT: show notification Trending now OUTPUT: {"action": "alert", "message": "Trending now"}
+INPUT: send alert Busy OUTPUT: {"action": "alert", "message": "Busy"}
+INPUT: show notification Ticket created OUTPUT: {"action": "alert", "message": "Ticket created"}
+INPUT: alright OUTPUT: {"action": "unrecognized", "input": "alright"}
+INPUT: happy birthday OUTPUT: {"action": "unrecognized", "input": "happy birthday"}
+INPUT: power on data_saver OUTPUT: {"action": "toggle", "setting": "data_saver"}
+INPUT: send alert Service restored OUTPUT: {"action": "alert", "message": "Service restored"}
+INPUT: show alert Message sent OUTPUT: {"action": "alert", "message": "Message sent"}
+INPUT: go to audio OUTPUT: {"action": "navigate", "target": "audio"}
+INPUT: display message Traffic update OUTPUT: {"action": "alert", "message": "Traffic update"}
+INPUT: you are the best OUTPUT: {"action": "unrecognized", "input": "you are the best"}
+INPUT: show location screen OUTPUT: {"action": "navigate", "target": "location"}
+INPUT: send alert Tip of the day OUTPUT: {"action": "alert", "message": "Tip of the day"}
+INPUT: when OUTPUT: {"action": "unrecognized", "input": "when"}
+INPUT: jump to services OUTPUT: {"action": "navigate", "target": "services"}
+INPUT: popup New update OUTPUT: {"action": "alert", "message": "New update"}
+INPUT: open trash OUTPUT: {"action": "navigate", "target": "trash"}
+INPUT: launch personal_profile OUTPUT: {"action": "toggle", "setting": "personal_profile"}
+INPUT: reload content OUTPUT: {"action": "refresh"}
+INPUT: later OUTPUT: {"action": "unrecognized", "input": "later"}
+INPUT: launch echo_cancellation OUTPUT: {"action": "toggle", "setting": "echo_cancellation"}
+INPUT: navigate to orders OUTPUT: {"action": "navigate", "target": "orders"}
+INPUT: popup Final call OUTPUT: {"action": "alert", "message": "Final call"}

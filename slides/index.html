@@ -242,8 +242,8 @@
                 <h2>What We'll Cover</h2>
                 <div class="cols">
                     <div class="card">
-                        <h4>1. The Big Picture</h4>
-                        <p>Why small models matter</p>
+                        <h4>1. Why Small Models</h4>
+                        <p>Size vs task matching</p>
                     </div>
                     <div class="card">
                         <h4>2. How They Work</h4>
@@ -252,17 +252,31 @@
                 </div>
                 <div class="cols">
                     <div class="card">
-                        <h4>3. Fine-Tuning</h4>
+                        <h4>3. Function Calling</h4>
+                        <p>The killer mobile feature</p>
+                    </div>
+                    <div class="card">
+                        <h4>4. Two Demos</h4>
+                        <p>From scratch to production</p>
+                    </div>
+                </div>
+                <div class="cols">
+                    <div class="card">
+                        <h4>5. Fine-Tuning</h4>
                         <p>Customize for your app</p>
                     </div>
                     <div class="card">
-                        <h4>4. When to Use Them</h4>
+                        <h4>6. When to Use</h4>
                         <p>Trade-offs & decisions</p>
                     </div>
                 </div>
                 <aside class="notes">
-                    <p>We'll start with WHY, then HOW, then see real demos.</p>
-                    <p>I'm a developer, not a researcher, so we focus on practical stuff.</p>
+                    <p>We'll start with WHY small models matter.</p>
+                    <p>Then HOW transformers work (simplified).</p>
+                    <p>Then FUNCTION CALLING - the key mobile use case.</p>
+                    <p>Two working demos you can run.</p>
+                    <p>How to fine-tune for your specific functions.</p>
+                    <p>When on-device beats cloud.</p>
                 </aside>
             </section>
 
@@ -505,6 +519,156 @@
                 </aside>
             </section>
 
+            <!-- ===== SECTION: FUNCTION CALLING ===== -->
+
+            <!-- Function Calling Intro -->
+            <section>
+                <h2>Function Calling: The Killer Feature</h2>
+                <p class="lead">The #1 use case for mobile AI</p>
+                <div class="example">
+                    <p>User: <span class="hl">"Set a reminder for tomorrow at 5pm"</span></p>
+                    <p>Model: <span class="green">set_reminder(title="...", time="tomorrow 5pm")</span></p>
+                </div>
+                <div class="cols">
+                    <div class="card">
+                        <h4>The Problem It Solves</h4>
+                        <ul>
+                            <li>Natural language → API calls</li>
+                            <li>No more regex parsing hell</li>
+                            <li>"remind me", "set alarm", "alert" → same function</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>Why It Matters</h4>
+                        <ul>
+                            <li>Voice assistants need this</li>
+                            <li>Chatbots need this</li>
+                            <li>Every app needs this</li>
+                        </ul>
+                    </div>
+                </div>
+                <aside class="notes">
+                    <p>Function calling is THE killer feature for mobile AI.</p>
+                    <p>Instead of writing parsers for every variation of "set alarm"...</p>
+                    <p>"remind me at 5", "alert me tomorrow", "wake me up at 7"...</p>
+                    <p>Just let the model figure it out. One function call covers all.</p>
+                </aside>
+            </section>
+
+            <!-- How Function Calling Works -->
+            <section>
+                <h2>How Function Calling Works</h2>
+                <div class="flow" style="font-size: 0.55em; margin: 0.5em 0;">
+                    <span class="box">"Remind me to call mom"</span>
+                    <span class="arrow">→</span>
+                    <span class="box">Tokenizer</span>
+                    <span class="arrow">→</span>
+                    <span class="box">Small LLM</span>
+                    <span class="arrow">→</span>
+                    <span class="box" style="background: rgba(139, 233, 192, 0.2);">set_reminder{...}</span>
+                </div>
+                <div class="cols">
+                    <div class="card">
+                        <h4>The Model's Job</h4>
+                        <ul>
+                            <li>Understand user intent</li>
+                            <li>Extract relevant parameters</li>
+                            <li>Output structured JSON</li>
+                            <li>Match to available functions</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>Your App's Job</h4>
+                        <ul>
+                            <li>Define available functions</li>
+                            <li>Execute the function call</li>
+                            <li>Show result to user</li>
+                        </ul>
+                    </div>
+                </div>
+                <aside class="notes">
+                    <p>The model doesn't actually DO anything - it outputs structured data.</p>
+                    <p>Your app receives: {"function": "set_reminder", "args": {"time": "5pm"}}</p>
+                    <p>Then your app calls the actual set_reminder() function.</p>
+                    <p>Model = language understanding. App = actual execution.</p>
+                </aside>
+            </section>
+
+            <!-- Function Calling Example -->
+            <section>
+                <h2>Function Calling Example</h2>
+                <div class="cols">
+                    <div class="card">
+                        <h4>App Defines Functions</h4>
+                        <pre><code class="language-json">{
+  "functions": [
+    {"name": "show_alert", 
+     "params": ["message"]},
+    {"name": "navigate", 
+     "params": ["screen"]},
+    {"name": "toggle", 
+     "params": ["setting"]}
+  ]
+}</code></pre>
+                    </div>
+                    <div class="card">
+                        <h4>Model Output</h4>
+                        <div class="example">
+                            <p><strong>User:</strong> "alert hello world"</p>
+                            <p><strong>Model:</strong></p>
+                            <pre><code class="language-json">{
+  "call": "show_alert",
+  "msg": "hello world"
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+                <div class="key-point">
+                    <p>Model maps <span class="hl">natural language</span> → <span class="green">structured output</span></p>
+                </div>
+                <aside class="notes">
+                    <p>1. Your app tells the model what functions exist.</p>
+                    <p>2. User speaks/types naturally.</p>
+                    <p>3. Model outputs JSON that matches one of your functions.</p>
+                    <p>4. Your app executes it.</p>
+                </aside>
+            </section>
+
+            <!-- Function Calling Models -->
+            <section>
+                <h2>Models for Function Calling</h2>
+                <table>
+                    <tr><th>Model</th><th>Size</th><th>Accuracy</th><th>Best For</th></tr>
+                    <tr><td>Tiny Transformer</td><td class="green">20K params</td><td class="dim">70%</td><td>Learning/Demo</td></tr>
+                    <tr><td>FunctionGemma</td><td class="green">270M</td><td class="accent">85%</td><td>Production Apps</td></tr>
+                    <tr><td>GPT-4o-mini</td><td class="dim">Cloud</td><td class="green">95%</td><td>Complex reasoning</td></tr>
+                </table>
+                <div class="cols">
+                    <div class="card">
+                        <h4>On-Device Advantage</h4>
+                        <ul>
+                            <li>85% is enough for most apps</li>
+                            <li>No latency, no cost</li>
+                            <li>Works offline</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>When to Use Cloud</h4>
+                        <ul>
+                            <li>Complex multi-step reasoning</li>
+                            <li>Need 95%+ accuracy</li>
+                            <li>Can tolerate latency</li>
+                        </ul>
+                    </div>
+                </div>
+                <aside class="notes">
+                    <p>Tiny Transformer: demo purposes, shows it's possible.</p>
+                    <p>FunctionGemma: real production use, fine-tuned for this task.</p>
+                    <p>GPT-4o-mini: best accuracy but costs money and needs internet.</p>
+                    <p>For most apps, 85% on-device beats 95% cloud due to UX.</p>
+                </aside>
+            </section>
+
             <!-- ===== SECTION: DEMO 1 ===== -->
 
             <!-- Demo 1 Intro -->
@@ -576,105 +740,69 @@
 
             <!-- Demo 2 Intro -->
             <section>
-                <h2>Demo 2: Function Calling</h2>
-                <p class="lead">The #1 use case for mobile AI</p>
-                <div class="example">
-                    <p>User: <span class="hl">"Set a reminder for tomorrow at 5pm"</span></p>
-                    <p>Model: <span class="green">set_reminder(title="...", time="tomorrow 5pm")</span></p>
-                </div>
-                <div class="cols">
-                    <div class="card">
-                        <h4>Why This Matters</h4>
-                        <ul>
-                            <li>Natural language → API calls</li>
-                            <li>No complex parsing code</li>
-                            <li>Works with your existing APIs</li>
-                        </ul>
-                    </div>
-                    <div class="card">
-                        <h4>The Model: Gemma 270M</h4>
-                        <p>270M parameters (~288MB)</p>
-                        <p>Fine-tuned for function calling</p>
-                        <p class="accent">58% → 85% accuracy</p>
-                    </div>
-                </div>
-                <aside class="notes">
-                    <p>Function calling is THE killer feature for mobile AI.</p>
-                    <p>Instead of writing regex parsers for "set alarm", "remind me", "create reminder"...</p>
-                    <p>Just let the model figure it out.</p>
-                    <p>Gemma 270M is Google's smallest instruction-tuned model.</p>
-                    <p>Fine-tuned specifically for this task.</p>
-                </aside>
-            </section>
-
-            <!-- Demo 2 How It Works -->
-            <section>
-                <h2>How Function Calling Works</h2>
-                <div class="flow" style="font-size: 0.55em; margin: 0.5em 0;">
-                    <span class="box">"Remind me to call mom"</span>
-                    <span class="arrow">→</span>
-                    <span class="box">Tokenizer</span>
-                    <span class="arrow">→</span>
-                    <span class="box">Gemma 270M</span>
-                    <span class="arrow">→</span>
-                    <span class="box" style="background: rgba(139, 233, 192, 0.2);">set_reminder{...}</span>
-                </div>
-                <div class="cols">
-                    <div class="card">
-                        <h4>Training Data</h4>
-                        <pre><code class="language-json">{
-  "user": "Remind me at 5pm",
-  "function": "set_reminder",
-  "params": {"time": "5pm"}
-}</code></pre>
-                    </div>
-                    <div class="card">
-                        <h4>Supported Functions</h4>
-                        <ul>
-                            <li>set_reminder(title, time)</li>
-                            <li>navigate_to_screen(screen)</li>
-                            <li>toggle_setting(setting, enabled)</li>
-                            <li>send_message(contact, text)</li>
-                        </ul>
-                    </div>
-                </div>
-                <aside class="notes">
-                    <p>The model is trained on pairs of: user text + function call.</p>
-                    <p>It learns: "remind me" → set_reminder function.</p>
-                    <p>"navigate", "go to", "open" → navigate_to_screen.</p>
-                    <p>Your app defines the functions. Model maps text to them.</p>
-                </aside>
-            </section>
-
-            <!-- Demo 2 Specs -->
-            <section>
-                <h2>Gemma 270M Specifications</h2>
+                <h2>Demo 2: FunctionGemma 270M</h2>
                 <div class="demo-box">
                     <div class="big">270M</div>
-                    <p>Parameters • ~288MB (INT4 quantized)</p>
+                    <p class="dim">Parameters • ~288MB (INT4 quantized)</p>
+                    <p>Runs on <span class="hl">mid-range phones</span>, ~500MB RAM</p>
                 </div>
                 <div class="cols">
-                    <table>
-                        <tr><th>Spec</th><th>Value</th></tr>
-                        <tr><td>Context Length</td><td>32K tokens</td></tr>
-                        <tr><td>Inference Speed</td><td>~126 tok/s</td></tr>
-                        <tr><td>Time to First Token</td><td>~0.3s</td></tr>
-                        <tr><td>RAM Usage</td><td>~551MB</td></tr>
-                    </table>
                     <div class="card">
-                        <h4>Device Requirements</h4>
+                        <h4>What We Built</h4>
                         <ul>
-                            <li>Mid-range+ Android phone</li>
-                            <li>iPhone 12 or newer</li>
-                            <li>~500MB free RAM</li>
+                            <li>llama.cpp native integration</li>
+                            <li>Android + iOS support</li>
+                            <li>Single function: show_alert</li>
+                            <li>Detects alert requests automatically</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>Performance</h4>
+                        <ul>
+                            <li>~0.3s time to first token</li>
+                            <li>~126 tokens/second</li>
+                            <li>Works offline</li>
+                            <li>Zero API cost</li>
                         </ul>
                     </div>
                 </div>
                 <aside class="notes">
-                    <p>288MB on disk. That's smaller than many apps!</p>
-                    <p>Generates 126 tokens per second - very fast.</p>
-                    <p>First response in 0.3 seconds - feels instant.</p>
-                    <p>Runs on mid-range Android, iPhone 12+.</p>
+                    <p>This is a real working app using llama.cpp.</p>
+                    <p>Model: FunctionGemma 270M, quantized to 4-bit (288MB).</p>
+                    <p>Runs on mid-range Android and iPhone 12+.</p>
+                    <p>Inference happens entirely on device - no network needed.</p>
+                </aside>
+            </section>
+
+            <!-- Demo 2 Architecture -->
+            <section>
+                <h2>How It's Built</h2>
+                <div class="flow" style="font-size: 0.55em; margin: 0.5em 0;">
+                    <span class="box">Kotlin UI</span>
+                    <span class="arrow">→</span>
+                    <span class="box">JNI Bridge</span>
+                    <span class="arrow">→</span>
+                    <span class="box">llama.cpp</span>
+                    <span class="arrow">→</span>
+                    <span class="box" style="background: rgba(139, 233, 192, 0.2);">GGUF Model</span>
+                </div>
+                <div class="card">
+                    <h4>Architecture: llama.cpp Native</h4>
+                    <pre><code class="language-plaintext">┌─────────────────┐
+│  Compose UI     │  ← Cross-platform UI
+├─────────────────┤
+│  LLM Engine     │  ← Platform interface
+├─────────────────┤
+│  llama.cpp      │  ← C++ inference engine
+├─────────────────┤
+│  GGUF Model     │  ← Quantized weights (288MB)
+└─────────────────┘</code></pre>
+                </div>
+                <aside class="notes">
+                    <p>We use llama.cpp - the most efficient CPU inference engine.</p>
+                    <p>JNI bridges Kotlin to C++ on Android.</p>
+                    <p>GGUF format with INT4 quantization shrinks model 4x.</p>
+                    <p>All runs on CPU - no GPU or NPU needed.</p>
                 </aside>
             </section>
 
