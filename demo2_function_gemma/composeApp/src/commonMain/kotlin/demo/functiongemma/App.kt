@@ -17,6 +17,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import demo.functiongemma.llm.*
+import kotlinx.coroutines.launch
 
 data class FunctionCall(
     val name: String,
@@ -28,18 +30,19 @@ data class ChatMessage(
     val id: Int,
     val text: String,
     val isUser: Boolean,
-    val functionCall: FunctionCall? = null
+    val functionCall: FunctionCall? = null,
+    val isError: Boolean = false
 )
 
 val availableFunctions = listOf(
-    FunctionDef("set_reminder", "Set a reminder", listOf("title", "time")),
-    FunctionDef("navigate_to_screen", "Navigate to screen", listOf("screen")),
-    FunctionDef("toggle_setting", "Toggle a setting", listOf("setting", "enabled")),
-    FunctionDef("send_message", "Send a message", listOf("contact", "message")),
-    FunctionDef("get_weather", "Get weather info", listOf("location")),
-    FunctionDef("play_music", "Play music", listOf("song", "artist")),
-    FunctionDef("set_timer", "Set a timer", listOf("duration")),
-    FunctionDef("make_call", "Make a phone call", listOf("contact"))
+    FunctionDef("set_reminder", "Set a reminder for a specific time", listOf("title", "time")),
+    FunctionDef("navigate_to_screen", "Navigate to a specific screen", listOf("screen")),
+    FunctionDef("toggle_setting", "Toggle a setting on or off", listOf("setting", "enabled")),
+    FunctionDef("send_message", "Send a message to a contact", listOf("contact", "message")),
+    FunctionDef("get_weather", "Get weather information for a location", listOf("location")),
+    FunctionDef("play_music", "Play a song by an artist", listOf("song", "artist")),
+    FunctionDef("set_timer", "Set a timer for a duration", listOf("duration")),
+    FunctionDef("make_call", "Make a phone call to a contact", listOf("contact"))
 )
 
 data class FunctionDef(
@@ -55,13 +58,27 @@ fun App() {
         var inputText by remember { mutableStateOf("") }
         var messageId by remember { mutableStateOf(0) }
         var selectedFunction by remember { mutableStateOf<FunctionDef?>(null) }
+        var isLoading by remember { mutableStateOf(false) }
+        var modelStatus by remember { mutableStateOf("Loading model...") }
+        
+        val llmEngine = remember { createLLMEngine() }
+        val scope = rememberCoroutineScope()
+        
+        LaunchedEffect(Unit) {
+            val error = llmEngine.initialize()
+            modelStatus = if (error == null) {
+                "Model loaded ✓"
+            } else {
+                "Model load failed: $error"
+            }
+        }
         
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
         ) {
-            TopBar()
+            TopBar(modelStatus = modelStatus)
             
             Row(modifier = Modifier.fillMaxSize().weight(1f)) {
                 Sidebar(
@@ -77,6 +94,7 @@ fun App() {
                 ) {
                     ChatArea(
                         messages = messages,
+                        isLoading = isLoading,
                         modifier = Modifier.weight(1f)
                     )
                     
@@ -84,18 +102,58 @@ fun App() {
                         text = inputText,
                         onTextChange = { inputText = it },
                         onSend = {
-                            if (inputText.isNotBlank()) {
+                            if (inputText.isNotBlank() && !isLoading) {
                                 val userMessage = ChatMessage(
                                     id = messageId++,
                                     text = inputText,
                                     isUser = true
                                 )
-                                val response = generateResponse(inputText)
-                                messages = messages + userMessage + response
+                                messages = messages + userMessage
+                                isLoading = true
+                                
+                                val tools = availableFunctions.map { func ->
+                                    Tool(
+                                        name = func.name,
+                                        description = func.description,
+                                        parameters = func.params.associateWith { "string" }
+                                    )
+                                }
+                                
+                                scope.launch {
+                                    val response = llmEngine.generateResponse(inputText, tools)
+                                    isLoading = false
+                                    
+                                    val responseMessage = when (response) {
+                                        is LLMResponse.Text -> ChatMessage(
+                                            id = messageId++,
+                                            text = response.content,
+                                            isUser = false
+                                        )
+                                        is LLMResponse.FunctionCall -> ChatMessage(
+                                            id = messageId++,
+                                            text = "Function called: ${response.result.name}",
+                                            isUser = false,
+                                            functionCall = FunctionCall(
+                                                name = response.result.name,
+                                                params = response.result.arguments,
+                                                timestamp = "now"
+                                            )
+                                        )
+                                        is LLMResponse.Error -> ChatMessage(
+                                            id = messageId++,
+                                            text = response.message,
+                                            isUser = false,
+                                            isError = true
+                                        )
+                                    }
+                                    messages = messages + responseMessage
+                                }
+                                
                                 inputText = ""
                             }
                         },
-                        selectedFunction = selectedFunction
+                        selectedFunction = selectedFunction,
+                        isLoading = isLoading
                     )
                 }
             }
@@ -104,7 +162,7 @@ fun App() {
 }
 
 @Composable
-fun TopBar() {
+fun TopBar(modelStatus: String) {
     TopAppBar(
         title = {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -121,7 +179,7 @@ fun TopBar() {
                         fontSize = 18.sp
                     )
                     Text(
-                        "On-device function calling",
+                        modelStatus,
                         fontSize = 12.sp,
                         color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
                     )
@@ -193,7 +251,7 @@ fun Sidebar(
                 }
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    "Gemma 270M IT\n~288MB (INT4)\n~0.3s TTFT\n~126 tok/s",
+                    "FunctionGemma 270M\n~230MB (Q4_0)\n~0.3s TTFT\n~60 tok/s",
                     fontSize = 11.sp,
                     color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.8f)
                 )
@@ -241,6 +299,7 @@ fun FunctionChip(
 @Composable
 fun ChatArea(
     messages: List<ChatMessage>,
+    isLoading: Boolean,
     modifier: Modifier = Modifier
 ) {
     if (messages.isEmpty()) {
@@ -286,6 +345,32 @@ fun ChatArea(
             items(messages) { message ->
                 MessageBubble(message)
             }
+            if (isLoading) {
+                item {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Start
+                    ) {
+                        Card(
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant
+                            )
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(12.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(16.dp),
+                                    strokeWidth = 2.dp
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("Thinking...", fontSize = 14.sp)
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
@@ -306,10 +391,11 @@ fun MessageBubble(message: ChatMessage) {
                 bottomEnd = if (isUser) 4.dp else 16.dp
             ),
             colors = CardDefaults.cardColors(
-                containerColor = if (isUser)
-                    MaterialTheme.colorScheme.primary
-                else
-                    MaterialTheme.colorScheme.surfaceVariant
+                containerColor = when {
+                    message.isError -> MaterialTheme.colorScheme.errorContainer
+                    isUser -> MaterialTheme.colorScheme.primary
+                    else -> MaterialTheme.colorScheme.surfaceVariant
+                }
             )
         ) {
             Column(modifier = Modifier.padding(12.dp)) {
@@ -318,10 +404,11 @@ fun MessageBubble(message: ChatMessage) {
                 } else {
                     Text(
                         message.text,
-                        color = if (isUser)
-                            MaterialTheme.colorScheme.onPrimary
-                        else
-                            MaterialTheme.colorScheme.onSurfaceVariant
+                        color = when {
+                            message.isError -> MaterialTheme.colorScheme.onErrorContainer
+                            isUser -> MaterialTheme.colorScheme.onPrimary
+                            else -> MaterialTheme.colorScheme.onSurfaceVariant
+                        }
                     )
                 }
             }
@@ -397,7 +484,8 @@ fun InputArea(
     text: String,
     onTextChange: (String) -> Unit,
     onSend: () -> Unit,
-    selectedFunction: FunctionDef?
+    selectedFunction: FunctionDef?,
+    isLoading: Boolean
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -444,105 +532,19 @@ fun InputArea(
                 
                 FilledIconButton(
                     onClick = onSend,
-                    enabled = text.isNotBlank()
+                    enabled = text.isNotBlank() && !isLoading
                 ) {
-                    Icon(Icons.Default.Send, contentDescription = "Send")
+                    if (isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            strokeWidth = 2.dp,
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
+                    } else {
+                        Icon(Icons.Default.Send, contentDescription = "Send")
+                    }
                 }
             }
         }
     }
-}
-
-fun generateResponse(input: String): ChatMessage {
-    val lowerInput = input.lowercase()
-    
-    val functionCall = when {
-        "remind" in lowerInput || "reminder" in lowerInput -> {
-            val time = extractValue(lowerInput, listOf("at", "for", "tomorrow", "today")) ?: "soon"
-            val title = extractTitle(lowerInput)
-            FunctionCall("set_reminder", mapOf("title" to title, "time" to time), "now")
-        }
-        "navigate" in lowerInput || "go to" in lowerInput || "open" in lowerInput -> {
-            val screen = when {
-                "setting" in lowerInput -> "settings"
-                "profil" in lowerInput -> "profile"
-                "home" in lowerInput -> "home"
-                else -> "home"
-            }
-            FunctionCall("navigate_to_screen", mapOf("screen" to screen), "now")
-        }
-        "dark mode" in lowerInput || "light mode" in lowerInput -> {
-            val enabled = "dark mode" in lowerInput && ("on" in lowerInput || "enable" in lowerInput || "turn" in lowerInput)
-            FunctionCall("toggle_setting", mapOf("setting" to "dark_mode", "enabled" to enabled.toString()), "now")
-        }
-        "weather" in lowerInput -> {
-            val location = extractValue(lowerInput, listOf("in", "at", "for")) ?: "current"
-            FunctionCall("get_weather", mapOf("location" to location), "now")
-        }
-        "message" in lowerInput || "send" in lowerInput -> {
-            val contact = extractValue(lowerInput, listOf("to")) ?: "contact"
-            val msg = extractMessage(lowerInput)
-            FunctionCall("send_message", mapOf("contact" to contact, "message" to msg), "now")
-        }
-        "timer" in lowerInput -> {
-            val duration = extractValue(lowerInput, listOf("for")) ?: "5 minutes"
-            FunctionCall("set_timer", mapOf("duration" to duration), "now")
-        }
-        "call" in lowerInput -> {
-            val contact = extractValue(lowerInput, listOf("call")) ?: "contact"
-            FunctionCall("make_call", mapOf("contact" to contact), "now")
-        }
-        "play" in lowerInput && ("music" in lowerInput || "song" in lowerInput) -> {
-            val song = extractValue(lowerInput, listOf("play")) ?: "music"
-            FunctionCall("play_music", mapOf("song" to song, "artist" to "unknown"), "now")
-        }
-        else -> null
-    }
-    
-    return ChatMessage(
-        id = (0..10000).random(),
-        text = if (functionCall != null) {
-            "Function call generated for: \"$input\""
-        } else {
-            "I can help you with reminders, navigation, settings, weather, messages, timers, calls, and music. Try: \"Set a reminder to buy milk tomorrow\""
-        },
-        isUser = false,
-        functionCall = functionCall
-    )
-}
-
-fun extractValue(input: String, keywords: List<String>): String? {
-    for (keyword in keywords) {
-        val index = input.indexOf(keyword)
-        if (index >= 0) {
-            val after = input.substring(index + keyword.length).trim()
-            val words = after.split(" ").take(3).filter { 
-                it !in listOf("at", "in", "to", "for", "the", "a", "an") 
-            }
-            if (words.isNotEmpty()) {
-                return words.joinToString(" ")
-            }
-        }
-    }
-    return null
-}
-
-fun extractTitle(input: String): String {
-    val words = input.split(" ")
-    val remindIndex = words.indexOfFirst { it.contains("remind") }
-    if (remindIndex >= 0) {
-        val titleWords = words.drop(remindIndex + 1)
-            .takeWhile { !listOf("at", "for", "tomorrow", "today", "pm", "am").contains(it) }
-        return titleWords.joinToString(" ").ifEmpty { "reminder" }
-    }
-    return "reminder"
-}
-
-fun extractMessage(input: String): String {
-    val words = input.split(" ")
-    val sayingIndex = words.indexOfFirst { it == "saying" }
-    if (sayingIndex >= 0) {
-        return words.drop(sayingIndex + 1).joinToString(" ")
-    }
-    return "hello"
 }

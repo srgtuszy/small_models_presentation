@@ -20,44 +20,42 @@ mobile-app/
 
 ## Prerequisites
 
-- **Android**: Android Studio with Android SDK
-- **iOS**: Xcode 15+ with Xcode command line tools
-
-## Running on Android Simulator
-
-1. Open Android Studio
-2. Select "Open an Existing Project"
-3. Navigate to `mobile-app/` and open
-4. Wait for Gradle sync to complete
-5. Create/select an Android emulator (API 26+)
-6. Click Run ▶️ or:
-   ```bash
-   cd mobile-app
-   ./gradlew installDebug
-   ```
+- **Android**: Android Studio with Android SDK (set `ANDROID_HOME`)
+- **iOS**: Xcode 15+ 
 
 ## Running on iOS Simulator
+
+**Important**: Do NOT run `assembleXCFramework` directly. Use these steps:
 
 1. Build the Kotlin framework:
    ```bash
    cd mobile-app
-   ./gradlew linkDebugFrameworkIosSimulatorArm64
+   ./gradlew :composeApp:linkDebugFrameworkIosSimulatorArm64
    ```
 
-2. Open Xcode:
+2. Open and run in Xcode:
    ```bash
    open iosApp/iosApp.xcodeproj
    ```
+   Then press ⌘R to run on iOS Simulator.
 
-3. Select an iOS Simulator target
-4. Click Run ▶️
-
-## Running on Desktop
+## Running on Android Simulator
 
 ```bash
 cd mobile-app
-./gradlew desktopRun
+export ANDROID_HOME=/path/to/android/sdk  # or add to local.properties
+./gradlew installDebug
 ```
+
+## Training the Model
+
+```bash
+cd ..  # back to demo1_tiny_transformer root
+pip install torch
+python tiny_transformer_train.py
+```
+
+The model will be trained and copied to all platform assets automatically.
 
 ## Training the Model
 

@@ -186,6 +186,36 @@ class TinyTransformer(private val config: ModelConfig) {
         return result.toIntArray()
     }
     
+    fun generateGreedy(inputIds: IntArray, maxNewTokens: Int, endToken: Int = -1): IntArray {
+        val result = inputIds.toMutableList()
+        
+        for (_i in 0 until maxNewTokens) {
+            val context = if (result.size > config.blockSize) {
+                result.takeLast(config.blockSize).toIntArray()
+            } else {
+                result.toIntArray()
+            }
+            
+            val logits = forward(context)
+            val lastLogits = logits[logits.size - 1]
+            
+            var maxIdx = 0
+            var maxVal = lastLogits[0]
+            for (i in 1 until lastLogits.size) {
+                if (lastLogits[i] > maxVal) {
+                    maxVal = lastLogits[i]
+                    maxIdx = i
+                }
+            }
+            
+            result.add(maxIdx)
+            
+            if (endToken >= 0 && maxIdx == endToken) break
+        }
+        
+        return result.toIntArray()
+    }
+    
     private fun softmax(logits: FloatArray): FloatArray {
         val maxVal = logits.max()
         val exps = FloatArray(logits.size) { exp(logits[it] - maxVal) }

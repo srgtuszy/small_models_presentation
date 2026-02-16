@@ -18,30 +18,24 @@ class CommandParser(
     private val blockSize: Int
 ) {
     private val json = Json { ignoreUnknownKeys = true }
+    private val stopToken: Int = stoi["}"] ?: -1
     
     fun parse(input: String): Command? {
         val prompt = "INPUT: $input OUTPUT: "
         val inputIds = encode(prompt)
         
-        val outputIds = model.generate(inputIds, maxNewTokens = 60)
+        val outputIds = model.generateGreedy(inputIds, maxNewTokens = 60, endToken = stopToken)
         val outputText = decode(outputIds)
         
         val outputPart = outputText.substringAfter("OUTPUT: ", "").trim()
-        val jsonStr = outputPart.substringBefore("").trim()
         
         return try {
+            val jsonStr = tryFixJson(outputPart)
             if (jsonStr.isNotEmpty()) {
                 json.decodeFromString<Command>(jsonStr)
             } else null
         } catch (e: Exception) {
-            val fixedJson = tryFixJson(outputPart)
-            if (fixedJson.isNotEmpty()) {
-                try {
-                    json.decodeFromString<Command>(fixedJson)
-                } catch (e2: Exception) {
-                    null
-                }
-            } else null
+            null
         }
     }
     

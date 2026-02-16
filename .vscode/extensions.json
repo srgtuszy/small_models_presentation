@@ -1,0 +1,11 @@
+{
+    "recommendations": [
+        "vadimcn.vscode-lldb",
+        "nisargjhaveri.android-debug",
+        "nisargjhaveri.ios-debug",
+        "fwcd.kotlin",
+        "vscjava.vscode-java-debug",
+        "redhat.java"
+    ],
+    "unwantedRecommendations": []
+}

@@ -1,0 +1,61 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build iOS Framework",
+            "type": "shell",
+            "command": "./gradlew",
+            "args": [
+                ":composeApp:linkDebugFrameworkIosSimulatorArm64"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/mobile-app"
+            },
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "Run iOS in Simulator",
+            "type": "shell",
+            "dependsOn": "Build iOS Framework",
+            "command": "open",
+            "args": [
+                "iosApp/iosApp.xcodeproj"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/mobile-app"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Build Android Debug",
+            "type": "shell",
+            "command": "./gradlew",
+            "args": [
+                "assembleDebug"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/mobile-app"
+            },
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "Install Android Debug",
+            "type": "shell",
+            "command": "./gradlew",
+            "args": [
+                "installDebug"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/mobile-app"
+            },
+            "group": "build",
+            "problemMatcher": []
+        }
+    ]
+}

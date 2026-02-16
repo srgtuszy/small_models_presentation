@@ -1,8 +1,7 @@
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
 
 plugins {
     kotlin("multiplatform")
-    kotlin("native.cocoapods")
     id("com.android.application")
     id("org.jetbrains.compose")
 }
@@ -24,19 +23,17 @@ kotlin {
         }
     }
     
-    iosX64()
-    iosArm64()
-    iosSimulatorArm64()
-
-    cocoapods {
-        version = "1.0.0"
-        summary = "Function Gemma Demo"
-        homepage = "https://github.com/demo"
-        ios.deploymentTarget = "14.0"
-        podfile = project.file("../iosApp/Podfile")
-        framework {
-            baseName = "shared"
+    val xcf = XCFramework("Shared")
+    
+    listOf(
+        iosArm64(),
+        iosX64(),
+        iosSimulatorArm64()
+    ).forEach { target ->
+        target.binaries.framework {
+            baseName = "Shared"
             isStatic = true
+            xcf.add(this)
         }
     }
     
@@ -80,17 +77,45 @@ kotlin {
 android {
     namespace = "demo.functiongemma"
     compileSdk = 34
+    ndkVersion = "27.0.12077973"
     
     defaultConfig {
         applicationId = "demo.functiongemma"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
+        
+        ndk {
+            abiFilters += listOf("arm64-v8a", "x86_64")
+        }
+        
+        externalNativeBuild {
+            cmake {
+                cppFlags += listOf("-std=c++17", "-fexceptions", "-frtti")
+                arguments += listOf(
+                    "-DCMAKE_BUILD_TYPE=Release",
+                    "-DBUILD_SHARED_LIBS=ON",
+                    "-DLLAMA_BUILD_COMMON=ON",
+                    "-DLLAMA_OPENSSL=OFF",
+                    "-DGGML_NATIVE=OFF",
+                    "-DGGML_BACKEND_DL=OFF",
+                    "-DGGML_LLAMAFILE=OFF",
+                    "-DGGML_CPU_KLEIDIAI=OFF"
+                )
+            }
+        }
     }
     
     buildFeatures {
         compose = true
+    }
+    
+    externalNativeBuild {
+        cmake {
+            path = file("src/native/cpp/CMakeLists.txt")
+            version = "3.22.1"
+        }
     }
     
     composeOptions {

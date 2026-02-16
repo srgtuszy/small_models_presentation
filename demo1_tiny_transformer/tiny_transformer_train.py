@@ -7,14 +7,15 @@ import math
 import random
 import os
 
-block_size = 128
-batch_size = 32
-n_layer = 2
+block_size = 64
+batch_size = 16
+n_layer = 3
 n_head = 2
-n_embd = 128
+n_embd = 96
 dropout = 0.1
-max_iters = 3000
+max_iters = 8000
 lr = 3e-3
+eval_interval = 1000
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 MESSAGES = [
@@ -85,16 +86,16 @@ def generate_sample():
         result = builder()
     return text, json.dumps(result, separators=(',', ': '))
 
-def generate_training_data(n_samples=2000):
+def generate_training_data(n_samples=2500):
     samples = []
     for _ in range(n_samples):
         text, json_out = generate_sample()
-        combined = f"INPUT: {text} OUTPUT: {json_out}<|endoftext|>"
+        combined = f"INPUT: {text} OUTPUT: {json_out}"
         samples.append(combined)
     return "\n".join(samples)
 
 print("Generating synthetic training data...")
-training_text = generate_training_data(3000)
+training_text = generate_training_data(2500)
 print(f"Generated {len(training_text)} characters of training data")
 
 chars = sorted(list(set(training_text)))
@@ -102,7 +103,7 @@ vocab_size = len(chars)
 stoi = {ch:i for i,ch in enumerate(chars)}
 itos = {i:ch for ch,i in stoi.items()}
 
-encode = lambda s: torch.tensor([stoi[c] for c in s], dtype=torch.long)
+encode = lambda s: [stoi[c] for c in s]
 decode = lambda t: ''.join([itos[int(i)] for i in t])
 
 data = torch.tensor(encode(training_text), dtype=torch.long)
@@ -191,7 +192,7 @@ class TinyTransformer(nn.Module):
         return logits, loss
 
     @torch.no_grad()
-    def generate(self, idx, max_new_tokens):
+    def generate(self, idx, max_new_tokens, stop_token=None):
         for _ in range(max_new_tokens):
             idx_cond = idx[:, -block_size:]
             logits, _ = self(idx_cond)
@@ -199,6 +200,20 @@ class TinyTransformer(nn.Module):
             probs = F.softmax(logits, dim=-1)
             next_id = torch.multinomial(probs, num_samples=1)
             idx = torch.cat((idx, next_id), dim=1)
+            if stop_token is not None and next_id.item() == stop_token:
+                break
+        return idx
+    
+    @torch.no_grad()
+    def generate_greedy(self, idx, max_new_tokens, stop_token=None):
+        for _ in range(max_new_tokens):
+            idx_cond = idx[:, -block_size:]
+            logits, _ = self(idx_cond)
+            logits = logits[:, -1, :]
+            next_id = torch.argmax(logits, dim=-1, keepdim=True)
+            idx = torch.cat((idx, next_id), dim=1)
+            if stop_token is not None and next_id.item() == stop_token:
+                break
         return idx
 
 model = TinyTransformer().to(device)
@@ -212,8 +227,17 @@ for it in range(max_iters+1):
     loss.backward()
     torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
     optimizer.step()
-    if it % 500 == 0:
-        print(f"Step {it}: loss = {loss.item():.4f}")
+    if it % eval_interval == 0:
+        model.eval()
+        val_loss = 0.0
+        with torch.no_grad():
+            for _ in range(10):
+                xv, yv = get_batch('val')
+                _, vloss = model(xv, yv)
+                val_loss += vloss.item()
+            val_loss /= 10
+        model.train()
+        print(f"Step {it}: train_loss = {loss.item():.4f}, val_loss = {val_loss:.4f}")
 
 os.makedirs('model_output', exist_ok=True)
 torch.save(model.state_dict(), 'model_output/tiny_transformer.pt')
@@ -233,6 +257,9 @@ with open('model_output/vocab.json', 'w') as f:
 print(f"Model saved! Size: {sum(p.numel() for p in model.parameters())/1e6:.2f}M parameters")
 print(f"Vocab size: {vocab_size}")
 
+stop_token = stoi.get('}', None)
+print(f"Stop token '}}' ID: {stop_token}")
+
 print("\nTesting inference:")
 test_inputs = [
     "show alert with message Hello",
@@ -245,12 +272,13 @@ test_inputs = [
 model.eval()
 for test in test_inputs:
     prompt = f"INPUT: {test} OUTPUT: "
-    context = encode(prompt).unsqueeze(0).to(device)
-    output = model.generate(context, max_new_tokens=50)[0].tolist()
+    context = torch.tensor([encode(prompt)], dtype=torch.long, device=device)
+    output = model.generate_greedy(context, max_new_tokens=50, stop_token=stop_token)[0].tolist()
     result = decode(output)
-    if '<|endoftext|>' in result:
-        result = result.split('<|endoftext|>')[0]
-    print(f"  '{test}' -> {result.split('OUTPUT: ')[-1]}")
+    if '}' in result:
+        result = result[:result.rfind('}')+1]
+    output_part = result.split('OUTPUT: ')[-1] if 'OUTPUT: ' in result else result
+    print(f"  '{test}' -> {output_part}")
 
 print("\nExporting to ONNX format...")
 dummy_input = torch.randint(0, vocab_size, (1, block_size), dtype=torch.long, device=device)
@@ -263,7 +291,7 @@ torch.onnx.export(
     output_names=['logits'],
     dynamic_axes={'input_ids': {0: 'batch', 1: 'seq'}, 'logits': {0: 'batch', 1: 'seq'}},
     do_constant_folding=True,
-    opset_version=14
+    opset_version=18
 )
 print("ONNX model exported to model_output/tiny_transformer.onnx")
 

@@ -1,37 +1,111 @@
 # Small Models Demo - Running Guide
 
-## Quick Start with VS Code Tasks
+## One-Click Debug in VS Code
 
-Press `Cmd+Shift+P` → "Tasks: Run Task" → Select a task:
+Press `F5` or go to **Run and Debug** panel → Select configuration → Click run:
 
-### Demo 1: Tiny Transformer (Python)
-- **▶ Demo 1: Train Tiny Transformer** - Run the training script (2-3 min)
-
-### Demo 2: Function Gemma (Kotlin Multiplatform)
-- **▶ Demo 2: Desktop App** - Launch on macOS/Windows/Linux
-- **▶ Demo 2: Android** - Install on connected device/emulator
-
-### Demo 3: Visual LLM (Kotlin Multiplatform)
-- **▶ Demo 3: Desktop App** - Launch on macOS/Windows/Linux
-- **▶ Demo 3: Android** - Install on connected device/emulator
-
-### Android Setup
-1. **📱 Android: List Available Emulators** - See all emulators
-2. **📱 Android: Boot First Emulator** - Start emulator in background
-3. **📱 Android: List Connected Devices** - Verify device is ready
-4. Run the install task
-
-### iOS Setup
-1. **🍎 iOS: List Simulators** - See available simulators
-2. **🍎 iOS: Boot iPhone 15 Simulator** - Start simulator
-3. **🍎 iOS: Open Demo X in Xcode** - Open in Xcode, then Run from Xcode
-
-### Slides
-- **📽 Slides: Start Presentation Server** - Start at http://localhost:8000
+| Configuration | What Happens |
+|---------------|--------------|
+| ▶ Demo 1: Train Tiny Transformer | Run Python training script |
+| ▶ Demo 2: Desktop Debug | Launch app with Kotlin debugger |
+| ▶ Demo 2: Android Debug | Boot emulator → build → install → launch → attach debugger |
+| ▶ Demo 2: iOS Debug | Boot simulator → build XCFramework → build app → launch → attach debugger |
+| ▶ Demo 3: Desktop Debug | Launch app with Kotlin debugger |
+| ▶ Demo 3: Android Debug | Boot emulator → build → install → launch → attach debugger |
+| ▶ Demo 3: iOS Debug | Boot simulator → build XCFramework → build app → launch → attach debugger |
+| 📽 Slides: Open Presentation | Start server → open browser |
 
 ---
 
-## Manual Commands
+## Prerequisites
+
+### Required Software
+- **JDK 17+** - For Kotlin/Gradle
+- **Xcode 15+** - For iOS development
+- **XcodeGen** - `brew install xcodegen`
+- **Android SDK** - With emulator created
+- **Python 3.8+** - For Demo 1
+
+### Required VS Code Extensions
+VS Code will prompt to install these when opening the workspace:
+
+| Extension | Purpose |
+|-----------|---------|
+| `vadimcn.vscode-lldb` | Core debugger (iOS + Native) |
+| `nisargjhaveri.android-debug` | Android debugging |
+| `nisargjhaveri.ios-debug` | iOS simulator debugging |
+| `fwcd.kotlin` | Kotlin language + debug adapter |
+| `vscjava.vscode-java-debug` | Java debugging support |
+| `redhat.java` | Java language support |
+
+Install all at once:
+```bash
+code --install-extension vadimcn.vscode-lldb
+code --install-extension nisargjhaveri.android-debug
+code --install-extension nisargjhaveri.ios-debug
+code --install-extension fwcd.kotlin
+code --install-extension vscjava.vscode-java-debug
+code --install-extension redhat.java
+```
+
+---
+
+## First-Time Setup
+
+### 1. Create Android Emulator (one-time)
+```bash
+# List available device definitions
+avdmanager list device
+
+# Create emulator (example: Pixel 7, API 34)
+echo "no" | avdmanager create avd \
+  -n "Pixel_7_API_34" \
+  -k "system-images;android-34;google_apis;arm64-v8a" \
+  -d "pixel_7"
+```
+
+Or use Android Studio: **Tools → Device Manager → Create Device**
+
+### 2. iOS Setup (automatic)
+iOS simulator will be created automatically if needed.
+
+---
+
+## Project Structure
+
+```
+small_models/
+├── .vscode/
+│   ├── extensions.json    # Extension recommendations
+│   ├── launch.json        # Debug configurations (F5)
+│   └── tasks.json         # Build tasks
+├── scripts/
+│   ├── ensure-android-emulator.sh
+│   └── ensure-ios-simulator.sh
+├── demo1_tiny_transformer/
+│   └── tiny_transformer_train.py
+├── demo2_function_gemma/
+│   ├── composeApp/
+│   │   ├── build.gradle.kts
+│   │   └── src/
+│   └── iosApp/
+│       ├── project.yml        # XcodeGen spec
+│       ├── iosApp.xcodeproj/  # Generated
+│       └── iosApp/
+│           ├── iOSApp.swift
+│           ├── ContentView.swift
+│           └── Info.plist
+├── demo3_visual_llm/
+│   └── (same structure)
+├── slides/
+│   └── index.html
+├── TALKING_POINTS.md
+└── README.md
+```
+
+---
+
+## Manual Commands (if needed)
 
 ### Demo 1: Python
 ```bash
@@ -41,51 +115,56 @@ python3 tiny_transformer_train.py
 
 ### Demo 2 & 3: Desktop
 ```bash
-cd demo2_function_gemma  # or demo3_visual_llm
+cd demo2_function_gemma
 ./gradlew run
 ```
 
 ### Demo 2 & 3: Android
 ```bash
-# Boot emulator (optional)
-emulator -list-avds                    # List available
-emulator -avd <name> &                 # Boot specific one
-
-# Build and install
 cd demo2_function_gemma
 ./gradlew :composeApp:installDebug
 ```
 
 ### Demo 2 & 3: iOS
 ```bash
-# Boot simulator
-xcrun simctl list devices              # List available
-xcrun simctl boot "iPhone 15"          # Boot specific one
-open -a Simulator
+cd demo2_function_gemma
 
-# Open in Xcode
-cd demo2_function_gemma/iosApp
-open iosApp.xcworkspace  # or .xcodeproj
-# Then press Cmd+R in Xcode
+# Generate Xcode project
+cd iosApp && xcodegen generate && cd ..
+
+# Build XCFramework
+./gradlew :composeApp:assembleSharedXCFramework
+
+# Build and run in simulator
+cd iosApp
+xcodebuild -project iosApp.xcodeproj -scheme iosApp \
+  -destination 'platform=iOS Simulator,name=iPhone 16' \
+  build
 ```
 
 ---
 
-## Prerequisites
+## Troubleshooting
 
-### For Python (Demo 1)
-- Python 3.8+
-- PyTorch: `pip install torch`
+### "No Android emulator available"
+Create one via Android Studio or command line (see First-Time Setup).
 
-### For Android (Demo 2 & 3)
-- Android SDK (~/Library/Android/sdk on macOS)
-- Android emulator or physical device with USB debugging
+### "xcodegen not found"
+```bash
+brew install xcodegen
+```
 
-### For iOS (Demo 2 & 3)
-- Xcode 15+
-- CocoaPods: `sudo gem install cocoapods`
-- Run `pod install` in iosApp/ directory before opening Xcode
+### iOS build fails with "Shared.xcframework not found"
+```bash
+cd demo2_function_gemma
+./gradlew :composeApp:assembleSharedXCFramework
+```
 
-### For Desktop (Demo 2 & 3)
-- JDK 17+
-- No additional setup needed
+### Android debugger won't attach
+1. Ensure device/emulator has USB debugging enabled
+2. Check `adb devices` shows your device
+3. Try: `adb kill-server && adb start-server`
+
+### iOS debugger won't attach
+1. Ensure simulator is booted: `open -a Simulator`
+2. Check LLDB can connect: `lldb` then `platform select ios-simulator`

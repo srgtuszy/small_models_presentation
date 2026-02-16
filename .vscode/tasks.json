@@ -6,210 +6,213 @@
             "type": "shell",
             "command": "python3",
             "args": ["tiny_transformer_train.py"],
-            "options": {
-                "cwd": "${workspaceFolder}/demo1_tiny_transformer"
-            },
+            "options": { "cwd": "${workspaceFolder}/demo1_tiny_transformer" },
             "group": "build",
             "detail": "Run the Python training script (2-3 min)",
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
-                "panel": "new",
-                "clear": true
-            },
-            "problemMatcher": []
+            "presentation": { "reveal": "always", "panel": "new", "clear": true }
         },
         {
-            "label": "▶ Demo 2: Desktop App",
+            "label": "▶ Demo 2: Desktop",
             "type": "shell",
             "command": "./gradlew",
             "args": ["run"],
-            "options": {
-                "cwd": "${workspaceFolder}/demo2_function_gemma"
-            },
+            "options": { "cwd": "${workspaceFolder}/demo2_function_gemma" },
             "group": "build",
             "detail": "Launch Function Gemma demo on desktop",
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
-                "panel": "new",
-                "clear": true
-            },
+            "presentation": { "reveal": "always", "panel": "new", "clear": true }
+        },
+        {
+            "label": "▶ Demo 2: Download Model",
+            "type": "shell",
+            "command": "./download_model.sh",
+            "options": { "cwd": "${workspaceFolder}/demo2_function_gemma" },
+            "group": "build",
+            "detail": "Download FunctionGemma GGUF model for llama.cpp",
+            "presentation": { "reveal": "always", "clear": true },
             "problemMatcher": []
         },
         {
-            "label": "▶ Demo 2: Android (Install on Device/Emulator)",
+            "label": "▶ Demo 2: Android Build",
+            "type": "shell",
+            "command": "./gradlew",
+            "args": [":composeApp:assembleDebug"],
+            "options": { "cwd": "${workspaceFolder}/demo2_function_gemma" },
+            "group": "build",
+            "detail": "Build Android APK with llama.cpp via Llamatik",
+            "presentation": { "reveal": "always", "clear": true }
+        },
+        {
+            "label": "▶ Demo 2: Android Install",
             "type": "shell",
             "command": "./gradlew",
             "args": [":composeApp:installDebug"],
-            "options": {
-                "cwd": "${workspaceFolder}/demo2_function_gemma"
-            },
+            "options": { "cwd": "${workspaceFolder}/demo2_function_gemma" },
             "group": "build",
-            "detail": "Install Function Gemma demo on connected Android device/emulator",
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
-                "panel": "shared",
-                "clear": true
-            },
+            "detail": "Install on connected Android device",
+            "presentation": { "reveal": "always", "clear": true }
+        },
+        {
+            "label": "▶ Demo 2: Android (Full)",
+            "dependsOn": ["▶ Demo 2: Android Build", "▶ Demo 2: Android Install"],
+            "dependsOrder": "sequence",
+            "group": { "kind": "build", "isDefault": false },
+            "detail": "Build and install app on connected device",
             "problemMatcher": []
         },
         {
-            "label": "▶ Demo 3: Desktop App",
+            "label": "▶ Demo 2: iOS Generate Project",
+            "type": "shell",
+            "command": "xcodegen",
+            "args": ["generate"],
+            "options": { "cwd": "${workspaceFolder}/demo2_function_gemma/iosApp" },
+            "group": "build",
+            "detail": "Generate Xcode project from project.yml",
+            "presentation": { "reveal": "silent" }
+        },
+        {
+            "label": "▶ Demo 2: iOS Build XCFramework",
+            "type": "shell",
+            "command": "./gradlew",
+            "args": [":composeApp:assembleSharedXCFramework"],
+            "options": { "cwd": "${workspaceFolder}/demo2_function_gemma" },
+            "group": "build",
+            "detail": "Build Shared.xcframework",
+            "presentation": { "reveal": "always", "clear": true }
+        },
+        {
+            "label": "▶ Demo 2: iOS Build App",
+            "type": "shell",
+            "command": "xcodebuild",
+            "args": [
+                "-project", "iosApp.xcodeproj",
+                "-scheme", "iosApp",
+                "-destination", "platform=iOS Simulator,name=iPhone 16",
+                "-configuration", "Debug",
+                "build"
+            ],
+            "options": { "cwd": "${workspaceFolder}/demo2_function_gemma/iosApp" },
+            "group": "build",
+            "detail": "Build iOS app for simulator",
+            "presentation": { "reveal": "always", "clear": true }
+        },
+        {
+            "label": "🍎 Ensure iOS Simulator",
+            "type": "shell",
+            "command": "${workspaceFolder}/scripts/ensure-ios-simulator.sh",
+            "group": "build",
+            "detail": "Boot iOS simulator if not running",
+            "presentation": { "reveal": "always" },
+            "problemMatcher": []
+        },
+        {
+            "label": "▶ Demo 2: iOS (Full)",
+            "dependsOn": [
+                "🍎 Ensure iOS Simulator",
+                "▶ Demo 2: iOS Generate Project",
+                "▶ Demo 2: iOS Build XCFramework",
+                "▶ Demo 2: iOS Build App"
+            ],
+            "dependsOrder": "sequence",
+            "group": "build",
+            "detail": "Boot simulator, generate project, build framework, build app",
+            "problemMatcher": []
+        },
+        {
+            "label": "▶ Demo 3: Desktop",
             "type": "shell",
             "command": "./gradlew",
             "args": ["run"],
-            "options": {
-                "cwd": "${workspaceFolder}/demo3_visual_llm"
-            },
+            "options": { "cwd": "${workspaceFolder}/demo3_visual_llm" },
             "group": "build",
             "detail": "Launch Visual LLM demo on desktop",
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
-                "panel": "new",
-                "clear": true
-            },
-            "problemMatcher": []
+            "presentation": { "reveal": "always", "panel": "new", "clear": true }
         },
         {
-            "label": "▶ Demo 3: Android (Install on Device/Emulator)",
+            "label": "▶ Demo 3: Android Build",
+            "type": "shell",
+            "command": "./gradlew",
+            "args": [":composeApp:assembleDebug"],
+            "options": { "cwd": "${workspaceFolder}/demo3_visual_llm" },
+            "group": "build",
+            "detail": "Build Android APK",
+            "presentation": { "reveal": "always", "clear": true }
+        },
+        {
+            "label": "▶ Demo 3: Android Install",
             "type": "shell",
             "command": "./gradlew",
             "args": [":composeApp:installDebug"],
-            "options": {
-                "cwd": "${workspaceFolder}/demo3_visual_llm"
-            },
+            "options": { "cwd": "${workspaceFolder}/demo3_visual_llm" },
             "group": "build",
-            "detail": "Install Visual LLM demo on connected Android device/emulator",
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
-                "panel": "shared",
-                "clear": true
-            },
+            "detail": "Install on connected Android device",
+            "presentation": { "reveal": "always", "clear": true }
+        },
+        {
+            "label": "▶ Demo 3: Android (Full)",
+            "dependsOn": ["📱 Ensure Android Emulator", "▶ Demo 3: Android Build", "▶ Demo 3: Android Install"],
+            "dependsOrder": "sequence",
+            "group": "build",
+            "detail": "Boot emulator, build, and install app",
             "problemMatcher": []
         },
         {
-            "label": "📱 Android: List Connected Devices",
+            "label": "▶ Demo 3: iOS Generate Project",
             "type": "shell",
-            "command": "adb",
-            "args": ["devices", "-l"],
+            "command": "xcodegen",
+            "args": ["generate"],
+            "options": { "cwd": "${workspaceFolder}/demo3_visual_llm/iosApp" },
             "group": "build",
-            "detail": "Show connected Android devices and emulators",
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "panel": "shared"
-            },
-            "problemMatcher": []
+            "detail": "Generate Xcode project from project.yml",
+            "presentation": { "reveal": "silent" }
         },
         {
-            "label": "📱 Android: List Available Emulators",
+            "label": "▶ Demo 3: iOS Build XCFramework",
             "type": "shell",
-            "command": "emulator",
-            "args": ["-list-avds"],
+            "command": "./gradlew",
+            "args": [":composeApp:assembleSharedXCFramework"],
+            "options": { "cwd": "${workspaceFolder}/demo3_visual_llm" },
             "group": "build",
-            "detail": "List all available Android emulators",
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "panel": "shared"
-            },
-            "problemMatcher": []
+            "detail": "Build Shared.xcframework",
+            "presentation": { "reveal": "always", "clear": true }
         },
         {
-            "label": "📱 Android: Boot First Emulator",
+            "label": "▶ Demo 3: iOS Build App",
             "type": "shell",
-            "command": "bash",
-            "args": ["-c", "nohup emulator -avd $(emulator -list-avds | head -1) -no-snapshot-load > /dev/null 2>&1 &"],
+            "command": "xcodebuild",
+            "args": [
+                "-project", "iosApp.xcodeproj",
+                "-scheme", "iosApp",
+                "-destination", "platform=iOS Simulator,name=iPhone 16",
+                "-configuration", "Debug",
+                "build"
+            ],
+            "options": { "cwd": "${workspaceFolder}/demo3_visual_llm/iosApp" },
             "group": "build",
-            "detail": "Boot the first available Android emulator in background",
-            "presentation": {
-                "echo": true,
-                "reveal": "silent",
-                "panel": "shared"
-            },
+            "detail": "Build iOS app for simulator",
+            "presentation": { "reveal": "always", "clear": true }
+        },
+        {
+            "label": "▶ Demo 3: iOS (Full)",
+            "dependsOn": [
+                "🍎 Ensure iOS Simulator",
+                "▶ Demo 3: iOS Generate Project",
+                "▶ Demo 3: iOS Build XCFramework",
+                "▶ Demo 3: iOS Build App"
+            ],
+            "dependsOrder": "sequence",
+            "group": "build",
+            "detail": "Boot simulator, generate project, build framework, build app",
             "problemMatcher": []
         },
         {
-            "label": "🍎 iOS: List Simulators",
-            "type": "shell",
-            "command": "xcrun",
-            "args": ["simctl", "list", "devices", "available"],
-            "group": "build",
-            "detail": "List available iOS simulators",
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "panel": "shared"
-            },
-            "problemMatcher": []
-        },
-        {
-            "label": "🍎 iOS: Boot iPhone 15 Simulator",
-            "type": "shell",
-            "command": "bash",
-            "args": ["-c", "xcrun simctl boot 'iPhone 15' 2>/dev/null || echo 'Simulator already booted or not found'; open -a Simulator"],
-            "group": "build",
-            "detail": "Boot iPhone 15 simulator and open Simulator app",
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "panel": "shared"
-            },
-            "problemMatcher": []
-        },
-        {
-            "label": "🍎 iOS: Open Demo 2 in Xcode",
-            "type": "shell",
-            "command": "bash",
-            "args": ["-c", "cd ${workspaceFolder}/demo2_function_gemma && ./gradlew :composeApp:linkDebugFrameworkIosSimulatorArm64 && open iosApp/iosApp.xcworkspace 2>/dev/null || open iosApp/iosApp.xcodeproj"],
-            "group": "build",
-            "detail": "Build iOS framework and open in Xcode",
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "panel": "shared"
-            },
-            "problemMatcher": []
-        },
-        {
-            "label": "🍎 iOS: Open Demo 3 in Xcode",
-            "type": "shell",
-            "command": "bash",
-            "args": ["-c", "cd ${workspaceFolder}/demo3_visual_llm && ./gradlew :composeApp:linkDebugFrameworkIosSimulatorArm64 && open iosApp/iosApp.xcworkspace 2>/dev/null || open iosApp/iosApp.xcodeproj"],
-            "group": "build",
-            "detail": "Build iOS framework and open in Xcode",
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "panel": "shared"
-            },
-            "problemMatcher": []
-        },
-        {
-            "label": "📽 Slides: Start Presentation Server",
+            "label": "📽 Slides: Start Server",
             "type": "shell",
             "command": "python3",
             "args": ["-m", "http.server", "8000"],
-            "options": {
-                "cwd": "${workspaceFolder}/slides"
-            },
+            "options": { "cwd": "${workspaceFolder}/slides" },
             "group": "build",
             "detail": "Start local server for presentation slides",
-            "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "panel": "new"
-            },
-            "problemMatcher": []
+            "presentation": { "reveal": "always", "panel": "new" }
         }
     ]
 }

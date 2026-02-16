@@ -23,12 +23,20 @@ kotlin {
         }
     }
     
-    listOf(
-        iosX64(),
-        iosArm64(),
-        iosSimulatorArm64()
-    ).forEach { iosTarget ->
-        iosTarget.binaries.framework {
+    iosX64 {
+        binaries.framework {
+            baseName = "shared"
+            isStatic = true
+        }
+    }
+    iosArm64 {
+        binaries.framework {
+            baseName = "shared"
+            isStatic = true
+        }
+    }
+    iosSimulatorArm64 {
+        binaries.framework {
             baseName = "shared"
             isStatic = true
         }
@@ -72,16 +80,6 @@ kotlin {
             iosArm64Main.dependsOn(this)
             iosSimulatorArm64Main.dependsOn(this)
         }
-        
-        val iosX64Test by getting
-        val iosArm64Test by getting
-        val iosSimulatorArm64Test by getting
-        val iosTest by creating {
-            dependsOn(commonMain)
-            iosX64Test.dependsOn(this)
-            iosArm64Test.dependsOn(this)
-            iosSimulatorArm64Test.dependsOn(this)
-        }
     }
 }
 
@@ -122,10 +120,14 @@ tasks.register("iosDeployResources") {
     }
 }
 
-tasks.named("linkDebugFrameworkIosX64") {
+tasks.matching { it.name == "linkDebugFrameworkIosSimulatorArm64" }.configureEach {
     dependsOn("iosDeployResources")
 }
 
-tasks.named("linkDebugFrameworkIosSimulatorArm64") {
+tasks.matching { it.name == "linkDebugFrameworkIosX64" }.configureEach {
+    dependsOn("iosDeployResources")
+}
+
+tasks.matching { it.name.startsWith("assemble") && it.name.contains("XCFramework") }.configureEach {
     dependsOn("iosDeployResources")
 }
