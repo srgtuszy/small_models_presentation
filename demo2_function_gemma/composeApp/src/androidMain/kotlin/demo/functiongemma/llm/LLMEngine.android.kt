@@ -67,17 +67,6 @@ class AndroidLLMEngine(private val context: Context) : LLMEngine {
             currentSystemPrompt = buildSystemPrompt(tools)
             val prompt = buildFunctionGemmaPrompt(userMessage, tools)
             
-            val lowerMsg = userMessage.lowercase()
-            val isAlertRequest = lowerMsg.contains("alert") || lowerMsg.contains("show") || 
-                                lowerMsg.contains("display") || lowerMsg.contains("popup")
-            
-            if (isAlertRequest) {
-                val msgContent = extractMessageContent(userMessage)
-                return@withContext LLMResponse.FunctionCall(
-                    FunctionCallResult("show_alert", mapOf("message" to msgContent))
-                )
-            }
-            
             val processResult = llama!!.processUserPrompt(prompt, MAX_TOKENS)
             
             if (processResult.isNotEmpty() && processResult.startsWith("Error")) {
@@ -104,45 +93,93 @@ class AndroidLLMEngine(private val context: Context) : LLMEngine {
     }
     
     private fun buildSystemPrompt(tools: List<Tool>): String {
-        return "You are an alert assistant."
+        val sb = StringBuilder()
+        sb.append("You are a model that can do function calling with the following functions")
+        
+        for (tool in tools) {
+            sb.append(buildFunctionDeclaration(tool))
+        }
+        
+        return sb.toString()
+    }
+    
+    private fun buildFunctionDeclaration(tool: Tool): String {
+        val sb = StringBuilder()
+        sb.append("<start_function_declaration>declaration:")
+        sb.append(tool.name)
+        sb.append("{description:<escape>")
+        sb.append(tool.description)
+        sb.append("<escape>,parameters:{properties:{")
+        
+        val props = tool.parameters["properties"] as? Map<*, *> ?: emptyMap<Any, Any>()
+        val required = (tool.parameters["required"] as? List<*>) ?: emptyList<Any>()
+        
+        val propEntries = props.entries.toList()
+        propEntries.forEachIndexed { index, entry ->
+            val paramName = entry.key.toString()
+            val paramDef = entry.value as? Map<*, *> ?: emptyMap<Any, Any>()
+            
+            if (index > 0) sb.append(",")
+            
+            sb.append(paramName)
+            sb.append(":{description:<escape>")
+            sb.append(paramDef["description"] ?: "")
+            sb.append("<escape>,type:<escape>")
+            sb.append(paramDef["type"] ?: "string")
+            sb.append("<escape>")
+            
+            val enum = paramDef["enum"] as? List<*>
+            if (enum != null) {
+                sb.append(",enum:<escape>[")
+                sb.append(enum.joinToString(",") { "\"$it\"" })
+                sb.append("]<escape>")
+            }
+            sb.append("}")
+        }
+        
+        sb.append("}},required:<escape>[")
+        sb.append(required.joinToString(",") { "\"$it\"" })
+        sb.append("]<escape>}}<end_function_declaration>")
+        
+        return sb.toString()
     }
     
     private fun buildFunctionGemmaPrompt(userMessage: String, tools: List<Tool>): String {
-        return "<bos><start_of_turn>user\n$userMessage<end_of_turn>\n<start_of_turn>model\n"
-    }
-    
-    private fun extractMessageContent(userMessage: String): String {
-        val lower = userMessage.lowercase()
-        val keywords = listOf("alert", "show", "display", "popup", "with", "saying", "message")
-        
-        var msg = userMessage
-        for (keyword in keywords) {
-            val idx = lower.indexOf(keyword)
-            if (idx >= 0) {
-                msg = userMessage.substring(idx + keyword.length).trim()
-                break
-            }
-        }
-        
-        return msg.trim('"', '\'')
+        val sb = StringBuilder()
+        sb.append("<bos><start_of_turn>developer\n")
+        sb.append(buildSystemPrompt(tools))
+        sb.append("<end_of_turn>\n")
+        sb.append("<start_of_turn>user\n")
+        sb.append(userMessage)
+        sb.append("<end_of_turn>\n")
+        sb.append("<start_of_turn>model\n")
+        return sb.toString()
     }
     
     private fun parseFunctionGemmaResponse(response: String): LLMResponse {
-        val funcRegex = """\{\s*"call"\s*:\s*"(\w+)"\s*,\s*"msg"\s*:\s*"([^"]*)"\s*\}""".toRegex()
-        val match = funcRegex.find(response)
+        val funcCallRegex = """<start_function_call>call:(\w+)\{([^}]*)\}<end_function_call>""".toRegex()
+        val match = funcCallRegex.find(response)
         
         if (match != null) {
             val functionName = match.groupValues[1]
-            val msg = match.groupValues[2]
-            return LLMResponse.FunctionCall(
-                FunctionCallResult(functionName, mapOf("message" to msg))
-            )
+            val paramsStr = match.groupValues[2]
+            val params = mutableMapOf<String, String>()
+            
+            val paramRegex = """(\w+):<escape>([^<]*)<escape>""".toRegex()
+            paramRegex.findAll(paramsStr).forEach { paramMatch ->
+                params[paramMatch.groupValues[1]] = paramMatch.groupValues[2]
+            }
+            
+            return LLMResponse.FunctionCall(FunctionCallResult(functionName, params))
         }
         
         val text = response
             .replace("<start_of_turn>", "")
             .replace("<end_of_turn>", "")
             .replace("<bos>", "")
+            .replace("<start_function_call>", "")
+            .replace("<end_function_call>", "")
+            .replace("<escape>", "")
             .trim()
         
         return LLMResponse.Text(text)
