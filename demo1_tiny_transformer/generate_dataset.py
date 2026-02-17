@@ -14,6 +14,32 @@ Goal: 100+ unique examples per category to improve model generalization.
 import random
 
 
+def generate_random_word_combinations(count=100):
+    """Generate random word combinations to teach the model to handle arbitrary text."""
+    words = [
+        'the', 'a', 'an', 'this', 'that', 'my', 'your', 'our', 'their',
+        'new', 'old', 'big', 'small', 'good', 'bad', 'fast', 'slow',
+        'message', 'alert', 'notification', 'update', 'info', 'news',
+        'system', 'user', 'data', 'file', 'item', 'task', 'job',
+        'done', 'ready', 'pending', 'complete', 'failed', 'success',
+        'start', 'stop', 'begin', 'end', 'open', 'close', 'save',
+        'loading', 'saving', 'processing', 'running', 'waiting',
+        'error', 'warning', 'info', 'debug', 'critical', 'urgent',
+        'test', 'demo', 'sample', 'example', 'custom', 'special',
+        'today', 'now', 'soon', 'later', 'tomorrow', 'yesterday',
+        'all', 'some', 'any', 'each', 'every', 'many', 'few', 'more',
+        'first', 'last', 'next', 'previous', 'current', 'final',
+        'incoming', 'outgoing', 'unread', 'new', 'recent', 'latest'
+    ]
+    
+    combinations = []
+    for _ in range(count):
+        num_words = random.randint(1, 4)
+        combo = ' '.join(random.choice(words) for _ in range(num_words))
+        combinations.append(combo)
+    return combinations
+
+
 def generate_dataset():
     """
     Generate training samples and return them as a list.
@@ -121,6 +147,42 @@ def generate_dataset():
 
     for msg in alert_messages:
         # Randomly select a template for variety
+        template = random.choice(alert_templates)
+        samples.append(f'INPUT: {template.format(msg)} OUTPUT: {{"action": "alert", "message": "{msg}"}}')
+    
+    # Add arbitrary text patterns to teach the model to extract ANY message
+    # These use synthetic patterns with numbers, random words, etc.
+    # This is crucial for generalization - the model must learn that any text can be a message
+    arbitrary_patterns = [
+        'abc', 'xyz', 'testing 123', 'random text', 'some message', 'my custom message',
+        'this is a test', 'custom alert', 'user defined', 'any text here', 'your message',
+        'whatever you want', 'can be anything', 'freeform text', 'type anything', 'say something',
+        'message 1', 'message 2', 'message 3', 'alert text', 'notification content',
+        'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten',
+        'foo bar baz', 'hello there', 'good news', 'bad news', 'important update',
+        'please read', 'urgent notice', 'breaking news', 'just testing', 'demo message',
+        'sample', 'example', 'placeholder', 'insert text', 'type here', 'edit me',
+        'alpha', 'beta', 'gamma', 'delta', 'epsilon', 'zeta', 'eta', 'theta',
+        'red', 'blue', 'green', 'yellow', 'purple', 'orange', 'black', 'white',
+        'cat', 'dog', 'bird', 'fish', 'lion', 'tiger', 'bear', 'wolf', 'fox',
+        'apple', 'banana', 'cherry', 'date', 'elderberry', 'fig', 'grape',
+        'messages', 'all messages', 'new messages', 'unread messages', 'pending messages'
+    ]
+    
+    for msg in arbitrary_patterns:
+        template = random.choice(alert_templates)
+        samples.append(f'INPUT: {template.format(msg)} OUTPUT: {{"action": "alert", "message": "{msg}"}}')
+    
+    # Generate synthetic messages with numbers to teach number handling
+    for i in range(50):
+        num = random.randint(1, 999)
+        synthetic_msg = f'message {num}'
+        template = random.choice(alert_templates)
+        samples.append(f'INPUT: {template.format(synthetic_msg)} OUTPUT: {{"action": "alert", "message": "{synthetic_msg}"}}')
+    
+    # Generate random word combinations for maximum diversity
+    random_combos = generate_random_word_combinations(150)
+    for msg in random_combos:
         template = random.choice(alert_templates)
         samples.append(f'INPUT: {template.format(msg)} OUTPUT: {{"action": "alert", "message": "{msg}"}}')
 
